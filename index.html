@@ -895,7 +895,8 @@ document.getElementById('join-confirm-btn').addEventListener('click', async () =
   local.myNum    = 2;
   local.roomRef  = roomRef;
 
-  await roomRef.child('p2Connected').set(true);
+  // Set p2 connected AND kick off cointoss phase atomically
+  await roomRef.update({ p2Connected: true, phase: 'cointoss' });
   roomRef.child('p2Connected').onDisconnect().set(false);
 
   btn.disabled = false; btn.textContent = 'Join Game →';
@@ -917,12 +918,6 @@ function attachRoomListener() {
     if (!snap.exists()) return;
     const d = snap.val();
     const screen = document.querySelector('.screen.active')?.id;
-
-    // ── P1 sees P2 joined → kick off cointoss phase ──
-    if (d.phase === 'waiting' && d.p2Connected && local.myRole === 'p1') {
-      local.roomRef.update({ phase: 'cointoss' });
-      return;
-    }
 
     // ── Both see cointoss phase → show coin screen ──
     if (d.phase === 'cointoss' && screen !== 'coin-screen') {
