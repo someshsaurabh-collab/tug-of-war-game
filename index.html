@@ -505,7 +505,7 @@ body {
 <div id="join-screen" class="screen">
   <div class="screen-title">Join a Room</div>
   <p style="color:#aaa; font-size:0.95rem;">Enter the room code from your friend</p>
-  <input class="code-input" id="code-input" maxlength="9" placeholder="LION-4821" autocomplete="off" spellcheck="false">
+  <input class="code-input" id="code-input" maxlength="6" placeholder="123456" autocomplete="off" spellcheck="false" inputmode="numeric">
   <div class="join-error" id="join-error"></div>
   <button class="btn-primary" id="join-confirm-btn">Join Game →</button>
   <button class="btn-danger" onclick="goHome()">✕ Back</button>
@@ -763,37 +763,26 @@ function movePieceAnimated(fromPos, toPos) {
 }
 
 // ════════════════════════════════════════
-//  ROOM CODE GENERATOR
+//  ROOM CODE GENERATOR — 6 digits
 // ════════════════════════════════════════
-const WORDS = ['LION','WOLF','BEAR','HAWK','PUMA','DEER','CRAB','DUCK','FROG','IBIS',
-               'LYNX','MOLE','NEWT','ORYX','WREN','KITE','JADE','HARE','GOAT','FISH'];
 function genRoomCode() {
-  const w = WORDS[Math.floor(Math.random()*WORDS.length)];
-  const n = Math.floor(1000+Math.random()*9000);
-  return `${w}-${n}`;
+  return String(Math.floor(100000 + Math.random() * 900000));
 }
 
 // ════════════════════════════════════════
 //  LOCAL SESSION STATE
 // ════════════════════════════════════════
 const local = {
-  myRole:     null,  // 'p1' or 'p2'
-  myNum:      null,  // 1 or 2
-  roomCode:   null,
-  roomRef:    null,
-  unsubscribe: null,
-  animating:  false,
-  lastProcessedRally: -1,
-  localPiecePos: 0,
+  myRole: null, myNum: null, roomCode: null, roomRef: null,
+  animating: false, lastRally: -1, piecePos: 0,
 };
-
 const PLAYERS = {
-  1: { name:'Player 1', avatar:'🦁', cardId:'card-p1', dir:-1, finish:-7 },
-  2: { name:'Player 2', avatar:'🐯', cardId:'card-p2', dir: 1, finish: 7 },
+  1: { name:'Player 1', avatar:'🦁', dir:-1, finish:-7 },
+  2: { name:'Player 2', avatar:'🐯', dir: 1, finish: 7 },
 };
 
 // ════════════════════════════════════════
-//  SCREEN HELPERS
+//  SCREENS
 // ════════════════════════════════════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -801,26 +790,17 @@ function showScreen(id) {
 }
 
 function goHome() {
-  cleanupRoom();
+  if (local.roomRef && local.myRole)
+    local.roomRef.child(local.myRole + 'Connected').set(false);
+  if (local.roomRef) local.roomRef.off(); // detach all listeners
+  Object.assign(local, { myRole:null, myNum:null, roomCode:null, roomRef:null,
+                          animating:false, lastRally:-1, piecePos:0 });
+  document.getElementById('disconnect-overlay').classList.remove('show');
   showScreen('home-screen');
 }
 
-function cleanupRoom() {
-  if (local.unsubscribe) { local.unsubscribe(); local.unsubscribe = null; }
-  if (local.roomRef && local.myRole) {
-    local.roomRef.child(local.myRole + 'Connected').set(false);
-  }
-  local.myRole = null; local.myNum = null;
-  local.roomCode = null; local.roomRef = null;
-  local.animating = false; local.lastProcessedRally = -1;
-  local.localPiecePos = 0;
-  document.getElementById('disconnect-overlay').classList.remove('show');
-}
-
 function copyCode() {
-  const code = local.roomCode;
-  if (!code) return;
-  navigator.clipboard.writeText(code).then(() => {
+  navigator.clipboard.writeText(local.roomCode || '').then(() => {
     const box = document.getElementById('room-code-display');
     const orig = box.textContent;
     box.textContent = 'COPIED!';
@@ -831,41 +811,26 @@ function copyCode() {
 // ════════════════════════════════════════
 //  CREATE ROOM
 // ════════════════════════════════════════
-document.getElementById('create-room-btn').addEventListener('click', () => {
+document.getElementById('create-room-btn').addEventListener('click', async () => {
   const code = genRoomCode();
   local.roomCode = code;
   local.myRole   = 'p1';
   local.myNum    = 1;
   local.roomRef  = db.ref('rooms/' + code);
 
-  // write initial room state
-  local.roomRef.set({
-    p1Connected: true,
-    p2Connected: false,
+  await local.roomRef.set({
+    p1Connected: true, p2Connected: false,
     phase: 'waiting',
-    piecePos: 0,
-    currentPlayer: 1,
-    rally: 0,
-    lastRoll: 0,
-    rollMsg: '',
-    winner: 0,
-    coinResult: 0,
+    piecePos: 0, currentPlayer: 1, rally: 0,
+    lastRoll: 0, rollMsg: '', winner: 0, coinResult: 0,
   });
-
-  // clean up if p1 disconnects
   local.roomRef.child('p1Connected').onDisconnect().set(false);
 
   document.getElementById('room-code-display').textContent = code;
   showScreen('create-screen');
 
-  // wait for p2 to join
-  const unsub = local.roomRef.child('p2Connected').on('value', snap => {
-    if (snap.val() === true) {
-      local.roomRef.child('p2Connected').off('value', unsub);
-      startMultiplayerGame();
-    }
-  });
-  local.unsubscribe = () => local.roomRef.child('p2Connected').off('value', unsub);
+  // Single listener drives everything from here
+  attachRoomListener();
 });
 
 // ════════════════════════════════════════
@@ -877,38 +842,34 @@ document.getElementById('join-room-btn').addEventListener('click', () => {
   showScreen('join-screen');
 });
 
-// auto-format input
 document.getElementById('code-input').addEventListener('input', e => {
-  let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  if (v.length > 4) v = v.slice(0,4) + '-' + v.slice(4,8);
-  e.target.value = v;
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
 });
 
 document.getElementById('join-confirm-btn').addEventListener('click', async () => {
-  const input = document.getElementById('code-input').value.trim().toUpperCase();
+  const code  = document.getElementById('code-input').value.trim();
   const errEl = document.getElementById('join-error');
   errEl.textContent = '';
 
-  if (!/^[A-Z]{4}-\d{4}$/.test(input)) {
-    errEl.textContent = 'Invalid code format. Try e.g. LION-4821';
+  if (!/^\d{6}$/.test(code)) {
+    errEl.textContent = 'Please enter a 6-digit code.';
     return;
   }
 
   const btn = document.getElementById('join-confirm-btn');
   btn.disabled = true; btn.textContent = 'Joining...';
 
-  const roomRef = db.ref('rooms/' + input);
-  const snap = await roomRef.once('value');
+  const roomRef = db.ref('rooms/' + code);
+  const snap    = await roomRef.once('value');
 
   if (!snap.exists()) {
-    errEl.textContent = '❌ Room not found. Check the code and try again.';
+    errEl.textContent = '❌ Room not found. Check the code.';
     btn.disabled = false; btn.textContent = 'Join Game →';
     return;
   }
-
   const data = snap.val();
   if (data.p2Connected) {
-    errEl.textContent = '❌ Room is full. Ask your friend to create a new one.';
+    errEl.textContent = '❌ Room is full.';
     btn.disabled = false; btn.textContent = 'Join Game →';
     return;
   }
@@ -918,7 +879,7 @@ document.getElementById('join-confirm-btn').addEventListener('click', async () =
     return;
   }
 
-  local.roomCode = input;
+  local.roomCode = code;
   local.myRole   = 'p2';
   local.myNum    = 2;
   local.roomRef  = roomRef;
@@ -927,191 +888,159 @@ document.getElementById('join-confirm-btn').addEventListener('click', async () =
   roomRef.child('p2Connected').onDisconnect().set(false);
 
   btn.disabled = false; btn.textContent = 'Join Game →';
-  startMultiplayerGame();
+
+  // Single listener drives everything from here
+  attachRoomListener();
 });
 
 // ════════════════════════════════════════
-//  START MULTIPLAYER (both players)
+//  ROOM LISTENER — single source of truth
+//  Every screen transition happens here.
 // ════════════════════════════════════════
-function startMultiplayerGame() {
-  buildBoard();
-  createPiece();
+let coinAnimPlayed = false;
 
-  // show coin toss screen
-  showScreen('coin-screen');
-  setupCoinTossUI();
-  setupCoinPlayersRow();
+function attachRoomListener() {
+  coinAnimPlayed = false;
 
-  // update phase to 'cointoss'
-  if (local.myRole === 'p1') {
-    local.roomRef.update({ phase: 'cointoss' });
-  }
-
-  // listen to room state
-  const handler = local.roomRef.on('value', snap => {
+  local.roomRef.on('value', snap => {
     if (!snap.exists()) return;
-    handleRoomState(snap.val());
-  });
-  local.unsubscribe = () => local.roomRef.off('value', handler);
+    const d = snap.val();
+    const screen = document.querySelector('.screen.active')?.id;
 
-  // watch for opponent disconnect
-  const oppRole = local.myRole === 'p1' ? 'p2Connected' : 'p1Connected';
-  local.roomRef.child(oppRole).on('value', snap => {
-    const currentScreen = document.querySelector('.screen.active')?.id;
-    if (snap.val() === false && currentScreen === 'game-screen') {
+    // ── P1 sees P2 joined → kick off cointoss phase ──
+    if (d.phase === 'waiting' && d.p2Connected && local.myRole === 'p1') {
+      local.roomRef.update({ phase: 'cointoss' });
+      return;
+    }
+
+    // ── Both see cointoss phase → show coin screen ──
+    if (d.phase === 'cointoss' && screen !== 'coin-screen') {
+      buildBoard(); createPiece();
+      showCoinScreen();
+      return;
+    }
+
+    // ── Both see animating_coin → play animation ──
+    if (d.phase === 'animating_coin' && !coinAnimPlayed) {
+      coinAnimPlayed = true;
+      if (screen !== 'coin-screen') showCoinScreen();
+      animateCoin(d.coinResult);
+      return;
+    }
+
+    // ── Both see playing → show/update game screen ──
+    if (d.phase === 'playing') {
+      if (screen !== 'game-screen' && screen !== 'win-screen') {
+        initGameScreen(d); return;
+      }
+      if (screen === 'game-screen' && d.rally > local.lastRally) {
+        local.lastRally = d.rally;
+        animateMove(d);
+      }
+    }
+
+    // ── Both see finished → show win screen ──
+    if (d.phase === 'finished' && screen !== 'win-screen') {
+      showWinScreen(d.winner, d.rally);
+    }
+  });
+
+  // Opponent disconnect
+  const oppField = local.myRole === 'p1' ? 'p2Connected' : 'p1Connected';
+  local.roomRef.child(oppField).on('value', snap => {
+    const screen = document.querySelector('.screen.active')?.id;
+    if (snap.val() === false &&
+        screen !== 'home-screen' && screen !== 'win-screen' && screen !== 'create-screen') {
       document.getElementById('disconnect-overlay').classList.add('show');
     }
   });
 }
 
-function setupCoinPlayersRow() {
-  const row = document.getElementById('coin-players-row');
-  row.innerHTML = `
-    <span>🦁 Player 1</span>
-    <span style="color:#f0c040;font-size:1.2rem;">⚔️</span>
-    <span>🐯 Player 2</span>
-  `;
-}
-
-function setupCoinTossUI() {
-  const tossBtn        = document.getElementById('toss-btn');
-  const waitingEl      = document.getElementById('waiting-to-toss');
-  const instructionEl  = document.getElementById('coin-instruction');
-
+// ════════════════════════════════════════
+//  COIN SCREEN
+// ════════════════════════════════════════
+function showCoinScreen() {
+  document.getElementById('coin-players-row').innerHTML =
+    `<span>🦁 P1</span><span style="color:#f0c040;margin:0 8px">⚔️</span><span>🐯 P2</span>`;
+  const tossBtn   = document.getElementById('toss-btn');
+  const waitingEl = document.getElementById('waiting-to-toss');
+  const instrEl   = document.getElementById('coin-instruction');
   if (local.myRole === 'p1') {
-    tossBtn.style.display    = 'block';
-    waitingEl.textContent    = '';
-    instructionEl.textContent = 'You decide who goes first — flip the coin!';
+    tossBtn.style.display = 'block';
+    tossBtn.disabled      = false;
+    waitingEl.textContent = '';
+    instrEl.textContent   = 'You decide — flip the coin!';
   } else {
-    tossBtn.style.display    = 'none';
-    waitingEl.textContent    = '⏳ Waiting for Player 1 to flip the coin...';
-    instructionEl.textContent = 'Coin toss in progress...';
+    tossBtn.style.display = 'none';
+    waitingEl.textContent = '⏳ Waiting for Player 1 to flip…';
+    instrEl.textContent   = '';
   }
+  document.getElementById('toss-result').textContent = '';
+  const coin = document.getElementById('coin');
+  coin.style.transform = '';
+  coin.classList.remove('flipping');
+  showScreen('coin-screen');
 }
 
-// ════════════════════════════════════════
-//  COIN TOSS — P1 flips, result synced
-// ════════════════════════════════════════
 document.getElementById('toss-btn').addEventListener('click', () => {
   if (local.myRole !== 'p1') return;
-  const btn = document.getElementById('toss-btn');
-  btn.disabled = true;
-
-  const winner = Math.random() < 0.5 ? 1 : 2; // 1=heads P1 first, 2=tails P2 first
+  document.getElementById('toss-btn').disabled = true;
+  const winner = Math.random() < 0.5 ? 1 : 2;
   local.roomRef.update({ coinResult: winner, phase: 'animating_coin' });
 });
 
-// ════════════════════════════════════════
-//  ROOM STATE HANDLER (central dispatcher)
-// ════════════════════════════════════════
-let coinAnimDone = false;
-
-function handleRoomState(data) {
-  const screen = document.querySelector('.screen.active')?.id;
-
-  // ── Coin toss animation ──
-  if (data.phase === 'animating_coin' && !coinAnimDone) {
-    coinAnimDone = true;
-    animateCoin(data.coinResult);
-    return;
-  }
-
-  // ── Game playing ──
-  if (data.phase === 'playing' && screen !== 'win-screen') {
-    if (screen !== 'game-screen') {
-      initGameScreen(data);
-      return;
-    }
-    // Only process new rolls (avoid re-animating on reconnect)
-    if (data.rally > local.lastProcessedRally) {
-      local.lastProcessedRally = data.rally;
-      syncGameState(data);
-    } else {
-      // just update UI without animation (e.g. first load)
-      updateTurnUI(data.currentPlayer, data.rally);
-      updateRollMsg(data.rollMsg);
-    }
-  }
-
-  // ── Game finished ──
-  if (data.phase === 'finished' && screen !== 'win-screen') {
-    showWinScreen(data.winner, data.rally);
-  }
-}
-
-// ════════════════════════════════════════
-//  COIN ANIMATION (both clients play it)
-// ════════════════════════════════════════
 function animateCoin(winner) {
-  const coin       = document.getElementById('coin');
-  const resultEl   = document.getElementById('toss-result');
-  const extraSpins = (5 + Math.floor(Math.random()*4)) * 360;
-  const landAngle  = winner === 1 ? extraSpins : extraSpins + 180;
+  const coin      = document.getElementById('coin');
+  const resultEl  = document.getElementById('toss-result');
+  const extraSpin = (5 + Math.floor(Math.random()*4)) * 360;
+  const landAngle = winner === 1 ? extraSpin : extraSpin + 180;
   coin.style.setProperty('--flip-end', landAngle + 'deg');
   playCoinSound();
   coin.classList.add('flipping');
-
   setTimeout(() => {
     coin.classList.remove('flipping');
-    coin.style.transform = `rotateY(${landAngle%360}deg)`;
-    const p = PLAYERS[winner];
-    resultEl.textContent = `${winner===1?'👑 Heads':'⚡ Tails'} — ${p.name} goes first!`;
-
-    setTimeout(() => {
-      coinAnimDone = false;
-      // p1 writes phase transition
-      if (local.myRole === 'p1') {
+    coin.style.transform = `rotateY(${landAngle % 360}deg)`;
+    resultEl.textContent = `${winner===1?'👑 Heads':'⚡ Tails'} — ${PLAYERS[winner].name} goes first!`;
+    // Only P1 writes the next phase
+    if (local.myRole === 'p1') {
+      setTimeout(() => {
         local.roomRef.update({
-          phase: 'playing',
-          currentPlayer: winner,
-          piecePos: 0,
-          rally: 0,
-          lastRoll: 0,
-          rollMsg: '',
-          winner: 0,
+          phase: 'playing', currentPlayer: winner,
+          piecePos: 0, rally: 0, lastRoll: 0, rollMsg: '', winner: 0,
         });
-      }
-    }, 1400);
+      }, 1400);
+    }
   }, 1700);
 }
 
 // ════════════════════════════════════════
-//  INIT GAME SCREEN
+//  GAME SCREEN INIT
 // ════════════════════════════════════════
 function initGameScreen(data) {
-  local.localPiecePos = data.piecePos || 0;
-  local.lastProcessedRally = data.rally || 0;
-
-  // show YOU badge
-  document.getElementById('you-badge-p1').style.display = local.myNum === 1 ? 'block' : 'none';
-  document.getElementById('you-badge-p2').style.display = local.myNum === 2 ? 'block' : 'none';
-
+  local.piecePos  = data.piecePos ?? 0;
+  local.lastRally = data.rally   ?? 0;
+  document.getElementById('you-badge-p1').style.display = local.myNum===1 ? 'block':'none';
+  document.getElementById('you-badge-p2').style.display = local.myNum===2 ? 'block':'none';
   showScreen('game-screen');
-
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    snapPiece(local.localPiecePos);
+    snapPiece(local.piecePos);
     updateTurnUI(data.currentPlayer, data.rally);
-    updateRollMsg(data.rollMsg || '');
-    updateDiceInteractivity(data.currentPlayer);
+    updateDice(data.currentPlayer);
   }));
 }
 
 // ════════════════════════════════════════
-//  SYNC GAME STATE (animate incoming move)
+//  ANIMATE INCOMING MOVE
 // ════════════════════════════════════════
-async function syncGameState(data) {
+async function animateMove(data) {
   if (local.animating) return;
   local.animating = true;
-
-  updateDiceInteractivity(0); // disable during anim
+  updateDice(0);
   document.getElementById('roll-result').textContent = '';
 
   const roll = data.lastRoll;
   const rot  = FACE_ROTATIONS[roll] || FACE_ROTATIONS[1];
   const dice = document.getElementById('dice');
-
-  // play dice animation
-  playDiceSound();
   const rx = parseInt(rot.rx), ry = parseInt(rot.ry);
   dice.style.setProperty('--rx',      rot.rx);
   dice.style.setProperty('--ry',      rot.ry);
@@ -1119,94 +1048,79 @@ async function syncGameState(data) {
   dice.style.setProperty('--ry-mid',  (ry+20)+'deg');
   dice.style.setProperty('--rx-near', (rx+8) +'deg');
   dice.style.setProperty('--ry-near', (ry+5) +'deg');
-  dice.classList.remove('rolling');
-  void dice.offsetWidth;
+  dice.classList.remove('rolling'); void dice.offsetWidth;
   dice.classList.add('rolling');
+  playDiceSound();
 
   await new Promise(r => setTimeout(r, 1100));
   dice.classList.remove('rolling');
   dice.style.transform = `rotateX(${rot.rx}) rotateY(${rot.ry})`;
 
-  // animate piece movement
-  const newPos = data.piecePos;
-  if (newPos !== local.localPiecePos) {
-    await movePieceAnimated(local.localPiecePos, newPos);
-    local.localPiecePos = newPos;
+  if (data.piecePos !== local.piecePos) {
+    await movePieceAnimated(local.piecePos, data.piecePos);
+    local.piecePos = data.piecePos;
   }
 
-  updateRollMsg(data.rollMsg);
+  document.getElementById('roll-result').textContent = data.rollMsg || '';
   updateTurnUI(data.currentPlayer, data.rally);
-  updateDiceInteractivity(data.currentPlayer);
+  updateDice(data.currentPlayer);
   local.animating = false;
 
-  // check win
-  if (data.phase === 'finished') {
-    setTimeout(() => showWinScreen(data.winner, data.rally), 400);
-  }
+  if (data.phase === 'finished') setTimeout(() => showWinScreen(data.winner, data.rally), 400);
 }
 
 // ════════════════════════════════════════
-//  ROLL DICE (active player only)
+//  ROLL DICE
 // ════════════════════════════════════════
 async function rollDice() {
   if (local.animating) return;
-  if (local.myNum !== getCurrentPlayerFromDB()) return;
+  const snap = await local.roomRef.once('value');
+  const d = snap.val();
+  if (d.currentPlayer !== local.myNum) return;
 
   local.animating = true;
-  updateDiceInteractivity(0);
+  updateDice(0);
 
-  const roll      = Math.floor(Math.random()*6) + 1;
-  const player    = PLAYERS[local.myNum];
-  const oldPos    = local.localPiecePos;
-  const newPos    = oldPos + player.dir * roll;
-  const finish    = player.finish;
-  const rally     = (await local.roomRef.child('rally').once('value')).val() + 1;
+  const roll    = Math.floor(Math.random()*6) + 1;
+  const player  = PLAYERS[local.myNum];
+  const oldPos  = local.piecePos;
+  const rawPos  = oldPos + player.dir * roll;
+  const finish  = player.finish;
+  const over    = (player.dir===-1 && rawPos<finish)||(player.dir===1 && rawPos>finish);
+  const win     = rawPos === finish;
+  const newPos  = win ? finish : (over ? oldPos : rawPos);
+  const next    = local.myNum === 1 ? 2 : 1;
+  const msg     = over ? `Rolled ${roll} — Overshoot! No move.`
+                : win  ? `Rolled ${roll} — Exact finish! 🎉`
+                :        `Rolled ${roll}`;
 
-  const overshoot = (player.dir===-1 && newPos<finish) || (player.dir===1 && newPos>finish);
-  const exactWin  = newPos === finish;
-  const finalPos  = (overshoot || exactWin) ? (exactWin ? finish : oldPos) : newPos;
-  const nextPlayer = local.myNum === 1 ? 2 : 1;
-  const msg = overshoot ? `Rolled ${roll} — Overshoot! No move.`
-            : exactWin  ? `Rolled ${roll} — Exact finish! 🎉`
-            : `Rolled ${roll}`;
-
-  const update = {
-    lastRoll: roll,
-    piecePos: finalPos,
-    currentPlayer: overshoot || exactWin ? nextPlayer : nextPlayer,
-    rally,
+  await local.roomRef.update({
+    lastRoll: roll, piecePos: newPos,
+    currentPlayer: next, rally: d.rally + 1,
     rollMsg: msg,
-    phase: exactWin ? 'finished' : 'playing',
-    winner: exactWin ? local.myNum : 0,
-  };
-
-  await local.roomRef.update(update);
+    phase: win ? 'finished' : 'playing',
+    winner: win ? local.myNum : 0,
+  });
   local.animating = false;
 }
 
-let _cachedCurrentPlayer = 1;
-function getCurrentPlayerFromDB() { return _cachedCurrentPlayer; }
+document.getElementById('dice').addEventListener('click', () => {
+  if (!document.getElementById('dice').classList.contains('disabled')) rollDice();
+});
 
 // ════════════════════════════════════════
 //  UI HELPERS
 // ════════════════════════════════════════
-function updateTurnUI(currentPlayer, rally) {
-  _cachedCurrentPlayer = currentPlayer;
-  document.getElementById('card-p1').classList.toggle('active', currentPlayer===1);
-  document.getElementById('card-p2').classList.toggle('active', currentPlayer===2);
+function updateTurnUI(cur, rally) {
+  document.getElementById('card-p1').classList.toggle('active', cur===1);
+  document.getElementById('card-p2').classList.toggle('active', cur===2);
   document.getElementById('rally-count').textContent = rally || 0;
-  const hint = document.getElementById('your-turn-hint');
-  hint.textContent = currentPlayer === local.myNum ? "It's your turn!" : "Opponent's turn...";
+  document.getElementById('your-turn-hint').textContent =
+    cur === local.myNum ? "⚡ Your turn!" : "⏳ Opponent's turn…";
 }
 
-function updateRollMsg(msg) {
-  document.getElementById('roll-result').textContent = msg || '';
-}
-
-function updateDiceInteractivity(currentPlayer) {
-  const dice = document.getElementById('dice');
-  const isMyTurn = currentPlayer === local.myNum && !local.animating;
-  dice.classList.toggle('disabled', !isMyTurn);
+function updateDice(cur) {
+  document.getElementById('dice').classList.toggle('disabled', cur !== local.myNum || local.animating);
 }
 
 // ════════════════════════════════════════
@@ -1219,9 +1133,10 @@ function showWinScreen(winner, rally) {
   const title = document.getElementById('win-title');
   title.textContent = `${p.name} Wins!`;
   title.className   = `win-title p${winner}`;
-  const isMe = winner === local.myNum;
-  document.getElementById('win-subtitle').textContent = isMe ? '🎉 You won! Congratulations!' : '😔 Better luck next time!';
-  document.getElementById('win-stats').textContent = `Finished in ${rally} ${rally===1?'rally':'rallies'}`;
+  document.getElementById('win-subtitle').textContent =
+    winner===local.myNum ? '🎉 You won! Congratulations!' : '😔 Better luck next time!';
+  document.getElementById('win-stats').textContent =
+    `Finished in ${rally} ${rally===1?'rally':'rallies'}`;
   showScreen('win-screen');
   spawnConfetti(winner);
 }
@@ -1234,38 +1149,23 @@ function spawnConfetti(player) {
   for (let i=0; i<90; i++) {
     const el = document.createElement('div');
     el.className = 'confetti-piece';
-    el.style.setProperty('--x', Math.random()*100+'vw');
-    el.style.setProperty('--dur', (1.5+Math.random()*2)+'s');
+    el.style.setProperty('--x',     Math.random()*100+'vw');
+    el.style.setProperty('--dur',   (1.5+Math.random()*2)+'s');
     el.style.setProperty('--delay', (Math.random()*1.5)+'s');
-    el.style.setProperty('--rot', (Math.random()*720-360)+'deg');
+    el.style.setProperty('--rot',   (Math.random()*720-360)+'deg');
     el.style.background = colors[Math.floor(Math.random()*colors.length)];
     screen.appendChild(el);
   }
 }
 
-// ════════════════════════════════════════
-//  DICE CLICK
-// ════════════════════════════════════════
-document.getElementById('dice').addEventListener('click', () => {
-  if (document.getElementById('dice').classList.contains('disabled')) return;
-  rollDice();
-});
-
-// ════════════════════════════════════════
-//  PLAY AGAIN
-// ════════════════════════════════════════
 document.getElementById('play-again-btn').addEventListener('click', () => {
   document.querySelectorAll('.confetti-piece').forEach(e => e.remove());
   goHome();
 });
 
-// ════════════════════════════════════════
-//  WINDOW RESIZE — reposition piece
-// ════════════════════════════════════════
 window.addEventListener('resize', () => {
-  if (document.getElementById('game-screen').classList.contains('active') && pieceEl) {
-    snapPiece(local.localPiecePos);
-  }
+  if (document.getElementById('game-screen').classList.contains('active') && pieceEl)
+    snapPiece(local.piecePos);
 });
 </script>
 </body>
