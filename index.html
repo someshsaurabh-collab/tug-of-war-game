@@ -244,6 +244,70 @@ body {
 .dice-label { font-size: 0.8rem; color: #aaa; letter-spacing: 1px; text-transform: uppercase; }
 #roll-result { font-size: 1rem; font-weight: 700; min-height: 1.4rem; color: #f0c040; text-align: center; }
 
+/* ───────── ROTATE OVERLAY ───────── */
+#rotate-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: #1a1a2e;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; text-align: center; padding: 32px;
+}
+#rotate-overlay .rotate-icon {
+  font-size: 4rem;
+  animation: rotatePhone 1.4s ease-in-out infinite;
+}
+@keyframes rotatePhone {
+  0%,100% { transform: rotate(0deg); }
+  40%,60% { transform: rotate(90deg); }
+}
+#rotate-overlay p { font-size: 1.2rem; color: #f0c040; font-weight: 700; }
+#rotate-overlay small { font-size: 0.9rem; color: #aaa; }
+
+/* Show overlay only in portrait on small screens */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+  #rotate-overlay { display: flex; }
+}
+
+/* ───────── LANDSCAPE MOBILE COMPACT ───────── */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  body { justify-content: flex-start; overflow-y: auto; }
+
+  #game-screen { padding: 6px 10px; gap: 0; justify-content: flex-start; min-height: unset; }
+
+  .game-header { margin-bottom: 6px; }
+  .game-title  { font-size: 1.1rem; }
+  .rally-box   { padding: 3px 12px; }
+  .rally-label { font-size: 0.6rem; }
+  .rally-count { font-size: 1.2rem; }
+
+  .players-row { margin-bottom: 6px; gap: 8px; }
+  .player-card { padding: 6px 10px; gap: 3px; border-radius: 10px; }
+  .player-avatar { font-size: 1.6rem; }
+  .player-name   { font-size: 0.75rem; }
+  .turn-indicator { font-size: 0.6rem; padding: 2px 8px; }
+
+  .dice-area { gap: 4px; margin-bottom: 0; }
+  .dice-wrap { perspective: 300px; }
+  .dice { width: 48px; height: 48px; }
+  .face { width: 48px; height: 48px; border-radius: 7px; }
+  .face-1 { transform: rotateY(0deg)   translateZ(24px); }
+  .face-6 { transform: rotateY(180deg) translateZ(24px); }
+  .face-2 { transform: rotateY(90deg)  translateZ(24px); }
+  .face-5 { transform: rotateY(-90deg) translateZ(24px); }
+  .face-3 { transform: rotateX(90deg)  translateZ(24px); }
+  .face-4 { transform: rotateX(-90deg) translateZ(24px); }
+  .pip    { width: 8px; height: 8px; }
+  .dice-label  { font-size: 0.65rem; }
+  #roll-result { font-size: 0.8rem; }
+
+  .board-wrapper { margin-bottom: 8px; }
+  .cell { aspect-ratio: 1 / 1; }
+  .cell.finish-p1,
+  .cell.finish-p2 { flex: 0 0 36px; font-size: 0.45rem; padding: 4px 2px; }
+  .cell-num { font-size: 0.65rem; }
+  .piece    { width: 22px; height: 22px; font-size: 0.65rem; }
+}
+
 /* ───────── WIN SCREEN ───────── */
 #win-screen { gap: 20px; position: relative; overflow: hidden; }
 .win-content { z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
@@ -277,6 +341,13 @@ body {
 </style>
 </head>
 <body>
+
+<!-- ══════════ ROTATE OVERLAY ══════════ -->
+<div id="rotate-overlay">
+  <div class="rotate-icon">📱</div>
+  <p>Please rotate your device</p>
+  <small>This game is best played in landscape mode</small>
+</div>
 
 <!-- ══════════ COIN TOSS ══════════ -->
 <div id="coin-screen" class="screen active">
