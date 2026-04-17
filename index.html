@@ -870,39 +870,41 @@ document.getElementById('join-confirm-btn').addEventListener('click', async () =
   const btn = document.getElementById('join-confirm-btn');
   btn.disabled = true; btn.textContent = 'Joining...';
 
-  const roomRef = db.ref('rooms/' + code);
-  const snap    = await roomRef.once('value');
+  try {
+    const roomRef = db.ref('rooms/' + code);
+    const snap    = await roomRef.once('value');
 
-  if (!snap.exists()) {
-    errEl.textContent = '❌ Room not found. Check the code.';
+    if (!snap.exists()) {
+      errEl.textContent = '❌ Room not found. Check the code.';
+      btn.disabled = false; btn.textContent = 'Join Game →';
+      return;
+    }
+    const data = snap.val();
+    if (data.p2Connected) {
+      errEl.textContent = '❌ Room is full.';
+      btn.disabled = false; btn.textContent = 'Join Game →';
+      return;
+    }
+
+    local.roomCode = code;
+    local.myRole   = 'p2';
+    local.myNum    = 2;
+    local.roomRef  = roomRef;
+
+    // Attach listener FIRST so we don't miss any phase change
+    attachRoomListener();
+
+    // Then update Firebase — listener will react to the change
+    await roomRef.update({ p2Connected: true, phase: 'cointoss' });
+    roomRef.child('p2Connected').onDisconnect().set(false);
+
     btn.disabled = false; btn.textContent = 'Join Game →';
-    return;
-  }
-  const data = snap.val();
-  if (data.p2Connected) {
-    errEl.textContent = '❌ Room is full.';
+
+  } catch (err) {
+    console.error('Join error:', err);
+    errEl.textContent = '❌ Error: ' + err.message;
     btn.disabled = false; btn.textContent = 'Join Game →';
-    return;
   }
-  if (data.phase !== 'waiting') {
-    errEl.textContent = '❌ Game already in progress.';
-    btn.disabled = false; btn.textContent = 'Join Game →';
-    return;
-  }
-
-  local.roomCode = code;
-  local.myRole   = 'p2';
-  local.myNum    = 2;
-  local.roomRef  = roomRef;
-
-  // Set p2 connected AND kick off cointoss phase atomically
-  await roomRef.update({ p2Connected: true, phase: 'cointoss' });
-  roomRef.child('p2Connected').onDisconnect().set(false);
-
-  btn.disabled = false; btn.textContent = 'Join Game →';
-
-  // Single listener drives everything from here
-  attachRoomListener();
 });
 
 // ════════════════════════════════════════
