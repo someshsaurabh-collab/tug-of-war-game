@@ -891,14 +891,23 @@ document.getElementById('join-confirm-btn').addEventListener('click', async () =
     local.myNum    = 2;
     local.roomRef  = roomRef;
 
-    // Attach listener FIRST so we don't miss any phase change
-    attachRoomListener();
-
-    // Then update Firebase — listener will react to the change
-    await roomRef.update({ p2Connected: true, phase: 'cointoss' });
-    roomRef.child('p2Connected').onDisconnect().set(false);
-
     btn.disabled = false; btn.textContent = 'Join Game →';
+
+    // Show coin screen immediately — don't block on Firebase write
+    buildBoard(); createPiece();
+    showCoinScreen();
+
+    // Write to Firebase in background, then attach full listener
+    roomRef.update({ p2Connected: true, phase: 'cointoss' })
+      .then(() => {
+        roomRef.child('p2Connected').onDisconnect().set(false);
+        attachRoomListener();
+      })
+      .catch(err => {
+        console.error('Firebase join write failed:', err);
+        alert('Connection error: ' + err.message);
+        goHome();
+      });
 
   } catch (err) {
     console.error('Join error:', err);
