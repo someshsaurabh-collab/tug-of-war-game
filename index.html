@@ -812,25 +812,36 @@ function copyCode() {
 //  CREATE ROOM
 // ════════════════════════════════════════
 document.getElementById('create-room-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('create-room-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+
   const code = genRoomCode();
   local.roomCode = code;
   local.myRole   = 'p1';
   local.myNum    = 1;
   local.roomRef  = db.ref('rooms/' + code);
 
-  await local.roomRef.set({
-    p1Connected: true, p2Connected: false,
-    phase: 'waiting',
-    piecePos: 0, currentPlayer: 1, rally: 0,
-    lastRoll: 0, rollMsg: '', winner: 0, coinResult: 0,
-  });
-  local.roomRef.child('p1Connected').onDisconnect().set(false);
-
+  // Show screen immediately — don't wait for Firebase
   document.getElementById('room-code-display').textContent = code;
   showScreen('create-screen');
+  btn.disabled = false;
+  btn.textContent = '🏠 Create Room';
 
-  // Single listener drives everything from here
-  attachRoomListener();
+  try {
+    await local.roomRef.set({
+      p1Connected: true, p2Connected: false,
+      phase: 'waiting',
+      piecePos: 0, currentPlayer: 1, rally: 0,
+      lastRoll: 0, rollMsg: '', winner: 0, coinResult: 0,
+    });
+    local.roomRef.child('p1Connected').onDisconnect().set(false);
+    attachRoomListener();
+  } catch (err) {
+    console.error('Firebase error:', err);
+    alert('Could not create room: ' + err.message + '\n\nMake sure Firebase Realtime Database is enabled in your project.');
+    goHome();
+  }
 });
 
 // ════════════════════════════════════════
