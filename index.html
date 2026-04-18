@@ -1037,10 +1037,13 @@ function attachRoomListener() {
 
     // ── Both see playing → show/update game screen ──
     if (d.phase === 'playing') {
+      console.log('[LISTENER] Phase: playing, screen:', screen, 'rally:', d.rally, 'lastRally:', local.lastRally);
       if (screen !== 'game-screen' && screen !== 'win-screen') {
+        console.log('[LISTENER] Initializing game screen');
         initGameScreen(d); return;
       }
       if (screen === 'game-screen' && d.rally > local.lastRally) {
+        console.log('[LISTENER] Rally updated, calling animateMove');
         local.lastRally = d.rally;
         animateMove(d);
       }
@@ -1048,6 +1051,7 @@ function attachRoomListener() {
 
     // ── Both see finished → show win screen ──
     if (d.phase === 'finished' && screen !== 'win-screen') {
+      console.log('[LISTENER] Phase: finished, showing win screen for winner:', d.winner);
       showWinScreen(d.winner, d.rally);
     }
   });
@@ -1154,6 +1158,8 @@ function initGameScreen(data) {
 //  ANIMATE INCOMING MOVE
 // ════════════════════════════════════════
 async function animateMove(data) {
+  console.log('[ANIMATE_MOVE]', {rally: data.rally, piecePos: data.piecePos, phase: data.phase, winner: data.winner});
+
   updateDice(0);
   document.getElementById('roll-result').textContent = '';
 
@@ -1181,14 +1187,21 @@ async function animateMove(data) {
 
   // Then move the piece
   if (data.piecePos !== local.piecePos) {
+    console.log('[PIECE_MOVE]', {from: local.piecePos, to: data.piecePos});
     await movePieceAnimated(local.piecePos, data.piecePos);
     local.piecePos = data.piecePos;
+  } else {
+    console.log('[PIECE_NO_MOVE]', {pos: local.piecePos});
   }
 
   updateTurnUI(data.currentPlayer, data.rally);
   updateDice(data.currentPlayer);
 
-  if (data.phase === 'finished') setTimeout(() => showWinScreen(data.winner, data.rally), 400);
+  console.log('[BEFORE_WIN_CHECK]', {phase: data.phase, winner: data.winner});
+  if (data.phase === 'finished') {
+    console.log('[SHOWING_WIN_SCREEN]', {winner: data.winner});
+    setTimeout(() => showWinScreen(data.winner, data.rally), 400);
+  }
 }
 
 // ════════════════════════════════════════
@@ -1215,6 +1228,8 @@ async function rollDice() {
   const msg     = over ? `Rolled ${roll} — Overshoot! No move.`
                 : win  ? `Rolled ${roll} — Exact finish! 🎉`
                 :        `Rolled ${roll}`;
+
+  console.log('[ROLL]', {player: local.myNum, roll, oldPos, rawPos, finish, over, win, newPos, msg});
 
   await local.roomRef.update({
     lastRoll: roll, piecePos: newPos,
