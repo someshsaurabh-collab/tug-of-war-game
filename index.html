@@ -613,6 +613,19 @@ body {
   </div>
 </div>
 
+<!-- ══════════ CONTINUE CONFIRMATION ══════════ -->
+<div id="continue-screen" class="screen">
+  <div style="text-align:center;gap:20px;display:flex;flex-direction:column;align-items:center;">
+    <div style="font-size:3rem;margin-bottom:20px;">🎮</div>
+    <div style="font-size:1.3rem;font-weight:700;color:#f0c040;">Game Restart</div>
+    <p id="continue-message" style="color:#aaa;font-size:1rem;margin:20px 0;">Alice wants to play again. Continue?</p>
+    <div style="display:flex;gap:14px;">
+      <button class="btn-primary" id="continue-yes-btn" style="width:120px;">Yes, Let's Go!</button>
+      <button class="btn-danger" id="continue-no-btn" style="width:120px;">No, Exit</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ FIREBASE ══════════ -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -787,7 +800,7 @@ function genRoomCode() {
 const local = {
   myRole: null, myNum: null, roomCode: null, roomRef: null,
   animating: false, lastRally: -1, piecePos: 0, playerName: '',
-  p1Name: 'Player 1', p2Name: 'Player 2',
+  p1Name: 'Player 1', p2Name: 'Player 2', coinTosser: 'p1',
 };
 const PLAYERS = {
   1: { name:'Player 1', avatar:'🦁', dir:-1, finish:-7 },
@@ -873,6 +886,7 @@ document.getElementById('create-room-btn').addEventListener('click', async () =>
       p1Connected: true, p2Connected: false,
       p1Name: local.playerName, p2Name: 'Player 2',
       phase: 'waiting',
+      coinTosser: 'p1',
       piecePos: 0, currentPlayer: 1, rally: 0,
       lastRoll: 0, rollMsg: '', winner: 0, coinResult: 0,
     });
@@ -974,7 +988,27 @@ function attachRoomListener() {
     const d = snap.val();
     local.p1Name = d.p1Name || 'Player 1';
     local.p2Name = d.p2Name || 'Player 2';
+    local.coinTosser = d.coinTosser || 'p1';
     const screen = document.querySelector('.screen.active')?.id;
+
+    // ── Initiator goes to coin screen, other sees confirmation ──
+    if (d.phase === 'restarting') {
+      const isInitiator = d.restartInitiator === local.myRole;
+      if (isInitiator) {
+        // I initiated the restart — go straight to coin screen
+        if (screen !== 'coin-screen') {
+          buildBoard(); createPiece();
+          showCoinScreen(d.coinTosser || 'p1');
+        }
+      } else {
+        // Opponent initiated — show confirmation dialog
+        const initiatorName = d.restartInitiator === 'p1' ? local.p1Name : local.p2Name;
+        document.getElementById('continue-message').textContent =
+          `${initiatorName} wants to play again. Continue?`;
+        showScreen('continue-screen');
+      }
+      return;
+    }
 
     // ── Both see cointoss phase → show coin screen ──
     if (d.phase === 'cointoss' && screen !== 'coin-screen') {
@@ -1022,20 +1056,24 @@ function attachRoomListener() {
 // ════════════════════════════════════════
 //  COIN SCREEN
 // ════════════════════════════════════════
-function showCoinScreen() {
+function showCoinScreen(coinTosser) {
+  // coinTosser defaults to 'p1' if not specified (for initial game)
+  coinTosser = coinTosser || 'p1';
   document.getElementById('coin-players-row').innerHTML =
     `<span>🦁 ${local.p1Name}</span><span style="color:#f0c040;margin:0 8px">⚔️</span><span>🐯 ${local.p2Name}</span>`;
   const tossBtn   = document.getElementById('toss-btn');
   const waitingEl = document.getElementById('waiting-to-toss');
   const instrEl   = document.getElementById('coin-instruction');
-  if (local.myRole === 'p1') {
+  const tosserName = coinTosser === 'p1' ? local.p1Name : local.p2Name;
+
+  if (local.myRole === coinTosser) {
     tossBtn.style.display = 'block';
     tossBtn.disabled      = false;
     waitingEl.textContent = '';
     instrEl.textContent   = 'You decide — flip the coin!';
   } else {
     tossBtn.style.display = 'none';
-    waitingEl.textContent = `⏳ Waiting for ${local.p1Name} to flip…`;
+    waitingEl.textContent = `⏳ Waiting for ${tosserName} to flip…`;
     instrEl.textContent   = '';
   }
   document.getElementById('toss-result').textContent = '';
@@ -1046,7 +1084,7 @@ function showCoinScreen() {
 }
 
 document.getElementById('toss-btn').addEventListener('click', () => {
-  if (local.myRole !== 'p1') return;
+  if (local.myRole !== local.coinTosser) return;
   document.getElementById('toss-btn').disabled = true;
   const winner = Math.random() < 0.5 ? 1 : 2;
   local.roomRef.update({ coinResult: winner, phase: 'animating_coin' });
@@ -1222,6 +1260,43 @@ function spawnConfetti(player) {
 
 document.getElementById('play-again-btn').addEventListener('click', () => {
   document.querySelectorAll('.confetti-piece').forEach(e => e.remove());
+
+  // Reset game state but keep room connection
+  local.animating = false;
+  local.lastRally = 0;
+  local.piecePos = 0;
+
+  // Write restart to Firebase — this player is now the coin tosser
+  local.roomRef.update({
+    phase: 'restarting',
+    restartInitiator: local.myRole,
+    coinTosser: local.myRole,
+    piecePos: 0, currentPlayer: 1, rally: 0,
+    lastRoll: 0, rollMsg: '', winner: 0, coinResult: 0,
+  });
+
+  showCoinScreen(local.myRole);
+});
+
+// ════════════════════════════════════════
+//  CONTINUE CONFIRMATION
+// ════════════════════════════════════════
+document.getElementById('continue-yes-btn').addEventListener('click', () => {
+  // Accept restart — move to coin screen
+  local.lastRally = 0;
+  local.piecePos = 0;
+  local.animating = false;
+  buildBoard();
+  createPiece();
+  // Get coinTosser from Firebase (it was set by the initiator)
+  local.roomRef.once('value', snap => {
+    const coinTosser = snap.val().coinTosser || 'p1';
+    showCoinScreen(coinTosser);
+  });
+});
+
+document.getElementById('continue-no-btn').addEventListener('click', () => {
+  // Decline restart — go home
   goHome();
 });
 
