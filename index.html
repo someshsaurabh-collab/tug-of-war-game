@@ -947,8 +947,11 @@ document.getElementById('change-mode-btn').addEventListener('click', () => {
 function startLocalGame() {
   buildBoard();
   createPiece();
-  snapPiece(0);
   showScreen('coin-screen');
+  // Use requestAnimationFrame to ensure DOM is ready before positioning piece
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    snapPiece(0);
+  }));
   setActivePlayerLocal(1);
   document.getElementById('toss-btn').disabled = false;
   document.getElementById('toss-btn').style.display = 'block';
@@ -1319,9 +1322,11 @@ function tossCoinLocal() {
     setTimeout(() => {
       buildBoard();
       createPiece();
-      snapPiece(0);
       setActivePlayerLocal(winner);
       showScreen('game-screen');
+      setTimeout(() => {
+        snapPiece(0);
+      }, 50);
       btn.disabled = false;
     }, 1400);
   }, 1700);
