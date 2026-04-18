@@ -993,6 +993,7 @@ function attachRoomListener() {
 
     // ── Initiator goes to coin screen, other sees confirmation ──
     if (d.phase === 'restarting') {
+      coinAnimPlayed = false; // Reset for new coin toss
       const isInitiator = d.restartInitiator === local.myRole;
       if (isInitiator) {
         // I initiated the restart — go straight to coin screen
@@ -1161,16 +1162,20 @@ async function animateMove(data) {
   dice.classList.add('rolling');
   playDiceSound();
 
+  // Dice rolling animation (1.1 seconds)
   await new Promise(r => setTimeout(r, 1100));
   dice.classList.remove('rolling');
   dice.style.transform = `rotateX(${rot.rx}) rotateY(${rot.ry})`;
 
+  // Show roll result immediately after dice stops rolling
+  document.getElementById('roll-result').textContent = data.rollMsg || '';
+
+  // Then move the piece
   if (data.piecePos !== local.piecePos) {
     await movePieceAnimated(local.piecePos, data.piecePos);
     local.piecePos = data.piecePos;
   }
 
-  document.getElementById('roll-result').textContent = data.rollMsg || '';
   updateTurnUI(data.currentPlayer, data.rally);
   updateDice(data.currentPlayer);
 
