@@ -26,7 +26,8 @@ const MONETIZATION_CONFIG = {
 
   // Ko-fi Donation Configuration
   KOFI: {
-    username: 'yourname'                    // Replace with your Ko-fi username (optional)
+    enabled: false,                         // Set to true when you have Ko-fi account
+    username: 'yourname'                    // Replace with your Ko-fi username
   }
 };
 
@@ -47,7 +48,9 @@ function initMonetization() {
 
   // Inject HTML elements
   injectAdContainers();
-  injectDonationButton();
+  if (MONETIZATION_CONFIG.KOFI.enabled) {
+    injectDonationButton();
+  }
 
   // Load Google AdSense
   loadGoogleAdSense();
