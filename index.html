@@ -483,8 +483,34 @@ body {
   </div>
 </div>
 
-<!-- ══════════ NAME INPUT ══════════ -->
-<div id="name-screen" class="screen active">
+<!-- ══════════ MODE SELECTION ══════════ -->
+<div id="mode-selection-screen" class="screen active">
+  <div class="home-emoji">⚔️</div>
+  <div class="home-title">TUG OF WAR</div>
+  <p style="color:#aaa;margin-bottom:40px;font-size:1rem;letter-spacing:2px;">Choose Game Mode</p>
+  <div class="home-buttons" style="gap:20px;width:300px;">
+    <button class="btn-primary" id="local-mode-btn" style="width:100%;">🎮 Local Play</button>
+    <button class="btn-secondary" id="remote-mode-btn" style="width:100%;">🌐 Remote Play</button>
+  </div>
+</div>
+
+<!-- ══════════ LOCAL MODE NAMES ══════════ -->
+<div id="local-names-screen" class="screen">
+  <div class="home-emoji">🎮</div>
+  <div class="home-title">LOCAL PLAY</div>
+  <p style="color:#aaa;margin-bottom:24px;font-size:1rem;">Enter player names (optional)</p>
+  <div style="display:flex;gap:16px;margin-bottom:24px;">
+    <input id="local-p1-name" placeholder="Player 1" style="font-size:1rem;padding:10px 16px;border:2px solid #f0c040;border-radius:20px;background:#16213e;color:#fff;text-align:center;width:130px;outline:none;" maxlength="15">
+    <input id="local-p2-name" placeholder="Player 2" style="font-size:1rem;padding:10px 16px;border:2px solid #f0c040;border-radius:20px;background:#16213e;color:#fff;text-align:center;width:130px;outline:none;" maxlength="15">
+  </div>
+  <div class="home-buttons" style="gap:14px;">
+    <button class="btn-primary" id="start-local-btn">▶ Start Game</button>
+    <button class="btn-danger" id="back-to-mode-btn">✕ Back</button>
+  </div>
+</div>
+
+<!-- ══════════ NAME INPUT (REMOTE MODE) ══════════ -->
+<div id="name-screen" class="screen">
   <div class="home-emoji">⚔️</div>
   <div class="home-title">TUG OF WAR</div>
   <p style="color:#aaa;margin-bottom:24px;font-size:1rem;">Enter your name</p>
@@ -620,6 +646,7 @@ body {
     <div class="win-subtitle" id="win-subtitle">🎉 Congratulations!</div>
     <div class="win-stats" id="win-stats">Finished in 12 rallies</div>
     <button id="play-again-btn">Play Again</button>
+    <button id="change-mode-btn" style="margin-top:12px;background:#666;padding:10px 28px;font-size:0.95rem;">↩ Change Game Mode</button>
   </div>
 </div>
 
@@ -818,6 +845,24 @@ const PLAYERS = {
 };
 
 // ════════════════════════════════════════
+//  LOCAL GAME MODE STATE
+// ════════════════════════════════════════
+const localGameState = {
+  currentPlayer: 1,
+  piecePos: 0,
+  rally: 0,
+  rolling: false,
+  gameOver: false,
+  p1Name: 'Player 1',
+  p2Name: 'Player 2',
+};
+
+// ════════════════════════════════════════
+//  GAME MODE TRACKING
+// ════════════════════════════════════════
+let gameMode = null; // 'local' or 'remote'
+
+// ════════════════════════════════════════
 //  SCREENS
 // ════════════════════════════════════════
 function showScreen(id) {
@@ -846,6 +891,160 @@ nameInput.addEventListener('input', updateNameButtons);
 nameInput.addEventListener('keypress', e => {
   if (e.key === 'Enter' && !createBtn.disabled) createBtn.click();
 });
+
+// ════════════════════════════════════════
+//  MODE SELECTION
+// ════════════════════════════════════════
+document.getElementById('local-mode-btn').addEventListener('click', () => {
+  gameMode = 'local';
+  showScreen('local-names-screen');
+});
+
+document.getElementById('remote-mode-btn').addEventListener('click', () => {
+  gameMode = 'remote';
+  nameInput.value = '';
+  updateNameButtons();
+  showScreen('name-screen');
+});
+
+document.getElementById('back-to-mode-btn').addEventListener('click', () => {
+  showScreen('mode-selection-screen');
+});
+
+document.getElementById('start-local-btn').addEventListener('click', () => {
+  const p1Name = document.getElementById('local-p1-name').value.trim() || 'Player 1';
+  const p2Name = document.getElementById('local-p2-name').value.trim() || 'Player 2';
+
+  localGameState.p1Name = p1Name;
+  localGameState.p2Name = p2Name;
+  localGameState.currentPlayer = 1;
+  localGameState.piecePos = 0;
+  localGameState.rally = 0;
+  localGameState.rolling = false;
+  localGameState.gameOver = false;
+
+  // Start local game with coin toss
+  startLocalGame();
+});
+
+document.getElementById('change-mode-btn').addEventListener('click', () => {
+  if (gameMode === 'local') {
+    document.getElementById('local-p1-name').value = '';
+    document.getElementById('local-p2-name').value = '';
+  } else if (gameMode === 'remote') {
+    // Disconnect from remote game
+    if (local.roomRef && local.myRole)
+      local.roomRef.child(local.myRole + 'Connected').set(false);
+    if (local.roomRef) local.roomRef.off();
+    Object.assign(local, { myRole:null, myNum:null, roomCode:null, roomRef:null,
+                            animating:false, lastRally:-1, piecePos:0, playerName:'',
+                            p1Name:'Player 1', p2Name:'Player 2' });
+  }
+  gameMode = null;
+  showScreen('mode-selection-screen');
+});
+
+function startLocalGame() {
+  buildBoard();
+  createPiece();
+  snapPiece(0);
+  showScreen('coin-screen');
+  setActivePlayerLocal(1);
+  document.getElementById('toss-btn').disabled = false;
+  document.getElementById('toss-btn').style.display = 'block';
+  document.getElementById('waiting-to-toss').textContent = '';
+  document.getElementById('coin-instruction').textContent = 'Flip the coin to decide who goes first!';
+  document.getElementById('toss-result').textContent = '';
+  const coin = document.getElementById('coin');
+  coin.style.transform = '';
+  coin.classList.remove('flipping');
+}
+
+function setActivePlayerLocal(p) {
+  localGameState.currentPlayer = p;
+  document.getElementById('card-p1').classList.toggle('active', p === 1);
+  document.getElementById('card-p2').classList.toggle('active', p === 2);
+  document.getElementById('your-turn-hint').textContent =
+    `${p === 1 ? localGameState.p1Name : localGameState.p2Name}'s turn`;
+}
+
+function updateRallyLocal() {
+  document.getElementById('rally-count').textContent = localGameState.rally || 0;
+}
+
+async function rollDiceLocal() {
+  if (localGameState.rolling || localGameState.gameOver) return;
+
+  localGameState.rolling = true;
+  document.getElementById('dice').classList.add('disabled');
+
+  const roll = Math.floor(Math.random() * 6) + 1;
+  const player = PLAYERS[localGameState.currentPlayer];
+  const oldPos = localGameState.piecePos;
+  const rawPos = oldPos + player.dir * roll;
+  const finishPos = player.finish;
+
+  localGameState.rally++;
+  updateRallyLocal();
+
+  // Animate dice
+  const rot = FACE_ROTATIONS[roll] || FACE_ROTATIONS[1];
+  const dice = document.getElementById('dice');
+  const rx = parseInt(rot.rx), ry = parseInt(rot.ry);
+  dice.style.setProperty('--rx', rot.rx);
+  dice.style.setProperty('--ry', rot.ry);
+  dice.style.setProperty('--rx-mid', (rx+25)+'deg');
+  dice.style.setProperty('--ry-mid', (ry+20)+'deg');
+  dice.style.setProperty('--rx-near', (rx+8)+'deg');
+  dice.style.setProperty('--ry-near', (ry+5)+'deg');
+  dice.classList.remove('rolling'); void dice.offsetWidth;
+  dice.classList.add('rolling');
+  playDiceSound();
+
+  await new Promise(r => setTimeout(r, 1100));
+  dice.classList.remove('rolling');
+  dice.style.transform = `rotateX(${rot.rx}) rotateY(${rot.ry})`;
+
+  const overshoot = (player.dir === -1 && rawPos < finishPos) || (player.dir === 1 && rawPos > finishPos);
+
+  if (overshoot) {
+    document.getElementById('roll-result').textContent = `Rolled ${roll} — Overshoot! No move.`;
+    nextTurnLocal();
+    localGameState.rolling = false;
+  } else {
+    document.getElementById('roll-result').textContent =
+      rawPos === finishPos ? `Rolled ${roll} — Exact finish! 🎉` : `Rolled ${roll}`;
+    const fromPos = localGameState.piecePos;
+    localGameState.piecePos = rawPos;
+    await movePieceAnimated(fromPos, rawPos);
+    if (rawPos === finishPos) {
+      localGameState.gameOver = true;
+      setTimeout(() => triggerWinLocal(localGameState.currentPlayer, localGameState.rally), 300);
+    } else {
+      nextTurnLocal();
+    }
+    localGameState.rolling = false;
+  }
+}
+
+function nextTurnLocal() {
+  setActivePlayerLocal(localGameState.currentPlayer === 1 ? 2 : 1);
+  document.getElementById('dice').classList.remove('disabled');
+}
+
+function triggerWinLocal(player, rallies) {
+  const p = PLAYERS[player];
+  const playerName = player === 1 ? localGameState.p1Name : localGameState.p2Name;
+  document.getElementById('win-avatar').textContent = p.avatar;
+  const title = document.getElementById('win-title');
+  title.textContent = `${playerName} Wins!`;
+  title.className = `win-title p${player}`;
+  document.getElementById('win-subtitle').textContent = '🎉 Congratulations!';
+  document.getElementById('win-stats').textContent =
+    `Finished in ${rallies} ${rallies === 1 ? 'rally' : 'rallies'}`;
+  showScreen('win-screen');
+  spawnConfetti(player);
+}
 
 function goHome() {
   if (local.roomRef && local.myRole)
@@ -1095,6 +1294,40 @@ function showCoinScreen(coinTosser) {
 }
 
 document.getElementById('toss-btn').addEventListener('click', () => {
+  if (gameMode === 'local') {
+    tossCoinLocal();
+  } else {
+    tossCoinRemote();
+  }
+});
+
+function tossCoinLocal() {
+  const btn = document.getElementById('toss-btn');
+  btn.disabled = true;
+  const coin = document.getElementById('coin');
+  const winner = Math.random() < 0.5 ? 1 : 2;
+  const extraSpins = (5 + Math.floor(Math.random() * 4)) * 360;
+  const landAngle = winner === 1 ? extraSpins : extraSpins + 180;
+  coin.style.setProperty('--flip-end', landAngle + 'deg');
+  playCoinSound();
+  coin.classList.add('flipping');
+  setTimeout(() => {
+    coin.classList.remove('flipping');
+    coin.style.transform = `rotateY(${landAngle % 360}deg)`;
+    const resultEl = document.getElementById('toss-result');
+    resultEl.textContent = `${winner===1?'👑 Heads':'⚡ Tails'} — ${PLAYERS[winner === 1 ? localGameState.p1Name : localGameState.p2Name] || (winner === 1 ? localGameState.p1Name : localGameState.p2Name)} goes first!`;
+    setTimeout(() => {
+      buildBoard();
+      createPiece();
+      snapPiece(0);
+      setActivePlayerLocal(winner);
+      showScreen('game-screen');
+      btn.disabled = false;
+    }, 1400);
+  }, 1700);
+}
+
+function tossCoinRemote() {
   if (local.myRole !== local.coinTosser) {
     console.warn('Not your turn to flip. myRole:', local.myRole, 'coinTosser:', local.coinTosser);
     return;
@@ -1106,7 +1339,7 @@ document.getElementById('toss-btn').addEventListener('click', () => {
       console.error('Coin flip error:', err);
       document.getElementById('toss-btn').disabled = false;
     });
-});
+}
 
 function animateCoin(winner) {
   const coin      = document.getElementById('coin');
@@ -1238,7 +1471,13 @@ async function rollDice() {
 }
 
 document.getElementById('dice').addEventListener('click', () => {
-  if (!document.getElementById('dice').classList.contains('disabled')) rollDice();
+  if (!document.getElementById('dice').classList.contains('disabled')) {
+    if (gameMode === 'local') {
+      rollDiceLocal();
+    } else {
+      rollDice();
+    }
+  }
 });
 
 // ════════════════════════════════════════
