@@ -473,8 +473,20 @@ body {
   </div>
 </div>
 
+<!-- ══════════ NAME INPUT ══════════ -->
+<div id="name-screen" class="screen active">
+  <div class="home-emoji">⚔️</div>
+  <div class="home-title">TUG OF WAR</div>
+  <p style="color:#aaa;margin-bottom:24px;font-size:1rem;">Enter your name</p>
+  <input id="name-input" placeholder="Your name" style="font-size:1.1rem;padding:12px 20px;border:2px solid #f0c040;border-radius:20px;background:#16213e;color:#fff;text-align:center;width:260px;outline:none;" maxlength="20">
+  <div class="home-buttons" style="margin-top:24px;">
+    <button class="btn-primary" id="create-room-btn" style="opacity:0.5;cursor:not-allowed;">🏠 Create Room</button>
+    <button class="btn-secondary" id="join-room-btn" style="opacity:0.5;cursor:not-allowed;">🚪 Join Room</button>
+  </div>
+</div>
+
 <!-- ══════════ HOME SCREEN ══════════ -->
-<div id="home-screen" class="screen active">
+<div id="home-screen" class="screen">
   <div class="home-emoji">⚔️</div>
   <div class="home-title">TUG OF WAR</div>
   <div class="home-subtitle">2 · PLAYER · ONLINE · DICE · GAME</div>
@@ -774,7 +786,8 @@ function genRoomCode() {
 // ════════════════════════════════════════
 const local = {
   myRole: null, myNum: null, roomCode: null, roomRef: null,
-  animating: false, lastRally: -1, piecePos: 0,
+  animating: false, lastRally: -1, piecePos: 0, playerName: '',
+  p1Name: 'Player 1', p2Name: 'Player 2',
 };
 const PLAYERS = {
   1: { name:'Player 1', avatar:'🦁', dir:-1, finish:-7 },
@@ -789,14 +802,39 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
+// ════════════════════════════════════════
+//  NAME INPUT
+// ════════════════════════════════════════
+const nameInput = document.getElementById('name-input');
+const createBtn = document.getElementById('create-room-btn');
+const joinBtn   = document.getElementById('join-room-btn');
+
+function updateNameButtons() {
+  const hasName = nameInput.value.trim().length > 0;
+  createBtn.style.opacity = hasName ? '1' : '0.5';
+  createBtn.style.cursor  = hasName ? 'pointer' : 'not-allowed';
+  createBtn.disabled = !hasName;
+  joinBtn.style.opacity = hasName ? '1' : '0.5';
+  joinBtn.style.cursor  = hasName ? 'pointer' : 'not-allowed';
+  joinBtn.disabled = !hasName;
+}
+
+nameInput.addEventListener('input', updateNameButtons);
+nameInput.addEventListener('keypress', e => {
+  if (e.key === 'Enter' && !createBtn.disabled) createBtn.click();
+});
+
 function goHome() {
   if (local.roomRef && local.myRole)
     local.roomRef.child(local.myRole + 'Connected').set(false);
   if (local.roomRef) local.roomRef.off(); // detach all listeners
   Object.assign(local, { myRole:null, myNum:null, roomCode:null, roomRef:null,
-                          animating:false, lastRally:-1, piecePos:0 });
+                          animating:false, lastRally:-1, piecePos:0, playerName:'',
+                          p1Name:'Player 1', p2Name:'Player 2' });
   document.getElementById('disconnect-overlay').classList.remove('show');
-  showScreen('home-screen');
+  nameInput.value = '';
+  updateNameButtons();
+  showScreen('name-screen');
 }
 
 function copyCode() {
@@ -820,6 +858,8 @@ document.getElementById('create-room-btn').addEventListener('click', async () =>
   local.roomCode = code;
   local.myRole   = 'p1';
   local.myNum    = 1;
+  local.playerName = nameInput.value.trim();
+  local.p1Name = local.playerName;
   local.roomRef  = db.ref('rooms/' + code);
 
   // Show screen immediately — don't wait for Firebase
@@ -831,6 +871,7 @@ document.getElementById('create-room-btn').addEventListener('click', async () =>
   try {
     await local.roomRef.set({
       p1Connected: true, p2Connected: false,
+      p1Name: local.playerName, p2Name: 'Player 2',
       phase: 'waiting',
       piecePos: 0, currentPlayer: 1, rally: 0,
       lastRoll: 0, rollMsg: '', winner: 0, coinResult: 0,
@@ -889,6 +930,9 @@ document.getElementById('join-confirm-btn').addEventListener('click', async () =
     local.roomCode = code;
     local.myRole   = 'p2';
     local.myNum    = 2;
+    local.playerName = nameInput.value.trim();
+    local.p2Name = local.playerName;
+    local.p1Name = data.p1Name || 'Player 1';
     local.roomRef  = roomRef;
 
     btn.disabled = false; btn.textContent = 'Join Game →';
@@ -898,7 +942,7 @@ document.getElementById('join-confirm-btn').addEventListener('click', async () =
     showCoinScreen();
 
     // Write to Firebase in background, then attach full listener
-    roomRef.update({ p2Connected: true, phase: 'cointoss' })
+    roomRef.update({ p2Connected: true, p2Name: local.playerName, phase: 'cointoss' })
       .then(() => {
         roomRef.child('p2Connected').onDisconnect().set(false);
         attachRoomListener();
@@ -928,6 +972,8 @@ function attachRoomListener() {
   local.roomRef.on('value', snap => {
     if (!snap.exists()) return;
     const d = snap.val();
+    local.p1Name = d.p1Name || 'Player 1';
+    local.p2Name = d.p2Name || 'Player 2';
     const screen = document.querySelector('.screen.active')?.id;
 
     // ── Both see cointoss phase → show coin screen ──
@@ -978,7 +1024,7 @@ function attachRoomListener() {
 // ════════════════════════════════════════
 function showCoinScreen() {
   document.getElementById('coin-players-row').innerHTML =
-    `<span>🦁 P1</span><span style="color:#f0c040;margin:0 8px">⚔️</span><span>🐯 P2</span>`;
+    `<span>🦁 ${local.p1Name}</span><span style="color:#f0c040;margin:0 8px">⚔️</span><span>🐯 ${local.p2Name}</span>`;
   const tossBtn   = document.getElementById('toss-btn');
   const waitingEl = document.getElementById('waiting-to-toss');
   const instrEl   = document.getElementById('coin-instruction');
@@ -989,7 +1035,7 @@ function showCoinScreen() {
     instrEl.textContent   = 'You decide — flip the coin!';
   } else {
     tossBtn.style.display = 'none';
-    waitingEl.textContent = '⏳ Waiting for Player 1 to flip…';
+    waitingEl.textContent = `⏳ Waiting for ${local.p1Name} to flip…`;
     instrEl.textContent   = '';
   }
   document.getElementById('toss-result').textContent = '';
@@ -1036,6 +1082,8 @@ function animateCoin(winner) {
 function initGameScreen(data) {
   local.piecePos  = data.piecePos ?? 0;
   local.lastRally = data.rally   ?? 0;
+  document.getElementById('card-p1').querySelector('.player-name').textContent = local.p1Name;
+  document.getElementById('card-p2').querySelector('.player-name').textContent = local.p2Name;
   document.getElementById('you-badge-p1').style.display = local.myNum===1 ? 'block':'none';
   document.getElementById('you-badge-p2').style.display = local.myNum===2 ? 'block':'none';
   showScreen('game-screen');
@@ -1050,8 +1098,6 @@ function initGameScreen(data) {
 //  ANIMATE INCOMING MOVE
 // ════════════════════════════════════════
 async function animateMove(data) {
-  if (local.animating) return;
-  local.animating = true;
   updateDice(0);
   document.getElementById('roll-result').textContent = '';
 
@@ -1081,7 +1127,6 @@ async function animateMove(data) {
   document.getElementById('roll-result').textContent = data.rollMsg || '';
   updateTurnUI(data.currentPlayer, data.rally);
   updateDice(data.currentPlayer);
-  local.animating = false;
 
   if (data.phase === 'finished') setTimeout(() => showWinScreen(data.winner, data.rally), 400);
 }
