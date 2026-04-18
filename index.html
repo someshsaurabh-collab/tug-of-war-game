@@ -1059,6 +1059,7 @@ function attachRoomListener() {
 function showCoinScreen(coinTosser) {
   // coinTosser defaults to 'p1' if not specified (for initial game)
   coinTosser = coinTosser || 'p1';
+  local.coinTosser = coinTosser;
   document.getElementById('coin-players-row').innerHTML =
     `<span>🦁 ${local.p1Name}</span><span style="color:#f0c040;margin:0 8px">⚔️</span><span>🐯 ${local.p2Name}</span>`;
   const tossBtn   = document.getElementById('toss-btn');
@@ -1084,10 +1085,17 @@ function showCoinScreen(coinTosser) {
 }
 
 document.getElementById('toss-btn').addEventListener('click', () => {
-  if (local.myRole !== local.coinTosser) return;
+  if (local.myRole !== local.coinTosser) {
+    console.warn('Not your turn to flip. myRole:', local.myRole, 'coinTosser:', local.coinTosser);
+    return;
+  }
   document.getElementById('toss-btn').disabled = true;
   const winner = Math.random() < 0.5 ? 1 : 2;
-  local.roomRef.update({ coinResult: winner, phase: 'animating_coin' });
+  local.roomRef.update({ coinResult: winner, phase: 'animating_coin' })
+    .catch(err => {
+      console.error('Coin flip error:', err);
+      document.getElementById('toss-btn').disabled = false;
+    });
 });
 
 function animateCoin(winner) {
@@ -1229,9 +1237,10 @@ function updateDice(cur) {
 function showWinScreen(winner, rally) {
   playWinSound();
   const p = PLAYERS[winner];
+  const winnerName = winner===1 ? local.p1Name : local.p2Name;
   document.getElementById('win-avatar').textContent = p.avatar;
   const title = document.getElementById('win-title');
-  title.textContent = `${p.name} Wins!`;
+  title.textContent = `${winnerName} Wins!`;
   title.className   = `win-title p${winner}`;
   document.getElementById('win-subtitle').textContent =
     winner===local.myNum ? '🎉 You won! Congratulations!' : '😔 Better luck next time!';
