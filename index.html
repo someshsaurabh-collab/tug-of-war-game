@@ -1035,24 +1035,19 @@ function attachRoomListener() {
       return;
     }
 
-    // ── Both see playing → show/update game screen ──
-    if (d.phase === 'playing') {
-      console.log('[LISTENER] Phase: playing, screen:', screen, 'rally:', d.rally, 'lastRally:', local.lastRally);
+    // ── Both see playing OR finished → show/update game screen ──
+    // (finished is the state after a winning roll, still needs animation)
+    if (d.phase === 'playing' || d.phase === 'finished') {
+      console.log('[LISTENER] Phase:', d.phase, 'screen:', screen, 'rally:', d.rally, 'lastRally:', local.lastRally);
       if (screen !== 'game-screen' && screen !== 'win-screen') {
         console.log('[LISTENER] Initializing game screen');
         initGameScreen(d); return;
       }
       if (screen === 'game-screen' && d.rally > local.lastRally) {
-        console.log('[LISTENER] Rally updated, calling animateMove');
+        console.log('[LISTENER] Rally updated, calling animateMove for phase:', d.phase);
         local.lastRally = d.rally;
-        animateMove(d);
+        animateMove(d);  // animateMove will handle showing win screen if phase === 'finished'
       }
-    }
-
-    // ── Both see finished → show win screen ──
-    if (d.phase === 'finished' && screen !== 'win-screen') {
-      console.log('[LISTENER] Phase: finished, showing win screen for winner:', d.winner);
-      showWinScreen(d.winner, d.rally);
     }
   });
 
