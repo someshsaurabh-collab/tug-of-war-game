@@ -15,18 +15,18 @@
 
 const MONETIZATION_CONFIG = {
   // ⚠️ MAIN TOGGLE: Set to true to enable, false to disable
-  ENABLED: false,
+  ENABLED: true,
 
   // Google AdSense Configuration
   ADSENSE: {
-    publisherId: 'ca-pub-xxxxxxxxxxxxxxxx', // Replace with your Publisher ID
-    topAdSlot: '1234567890',                // Replace with your top ad slot ID
-    bottomAdSlot: '9876543210'              // Replace with your bottom ad slot ID
+    publisherId: 'pub-5925451023602971',    // Your Publisher ID ✓
+    topAdSlot: '3993550080',                // Top Ad Unit ✓
+    bottomAdSlot: '9928403042'              // Bottom Ad Unit ✓
   },
 
   // Ko-fi Donation Configuration
   KOFI: {
-    username: 'yourname'                    // Replace with your Ko-fi username
+    username: 'yourname'                    // Replace with your Ko-fi username (optional)
   }
 };
 
