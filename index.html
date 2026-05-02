@@ -3,657 +3,660 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Free Online Games – Play Browser Games Free | GameZone</title>
-<meta name="description" content="Play free online browser games! 2-player games, puzzle games, classic arcade games and more. No download needed. Play instantly on mobile and desktop.">
-<meta name="keywords" content="free online games, browser games, 2 player games, puzzle games, arcade games, play online free, tug of war, snake game, tic tac toe, memory game">
-<meta name="author" content="GameZone">
+<title>BlitzGames – Free Online Games | Play Browser Games Free</title>
+<meta name="description" content="Play free online browser games at BlitzGames! 2-player games, puzzle games, classic arcade games and more. No download needed. Play instantly on mobile and desktop.">
+<meta name="keywords" content="free online games, browser games, 2 player games, puzzle games, arcade games, play online free, blitz games, fun games, games to play">
+<meta name="author" content="BlitzGames">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="SJN86QyJ7tJvXfWX_UZUv6pydteqSl4EolBnKASGPC8">
 <link rel="canonical" href="https://tug-of-war-game-nu.vercel.app/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Free Online Games – Play Browser Games Free | GameZone">
-<meta property="og:description" content="Play free online browser games instantly! No downloads, no sign-up needed.">
+<meta property="og:title" content="BlitzGames – Free Online Games | Play Browser Games Free">
+<meta property="og:description" content="Play free online browser games instantly at BlitzGames! No downloads, no sign-up.">
 <meta property="og:url" content="https://tug-of-war-game-nu.vercel.app/">
 <meta property="og:image" content="https://tug-of-war-game-nu.vercel.app/preview.png">
-<meta property="og:site_name" content="GameZone">
+<meta property="og:site_name" content="BlitzGames">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Free Online Games – Play Browser Games Free | GameZone">
+<meta name="twitter:title" content="BlitzGames – Free Online Games | Play Browser Games Free">
 <meta name="twitter:description" content="Play free browser games instantly. No downloads needed!">
 <meta name="twitter:image" content="https://tug-of-war-game-nu.vercel.app/preview.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "GameZone",
+  "name": "BlitzGames",
   "url": "https://tug-of-war-game-nu.vercel.app/",
-  "description": "Free online browser games. Play 2-player, puzzle, arcade and classic games instantly.",
-  "potentialAction": { "@type": "SearchAction", "target": "https://tug-of-war-game-nu.vercel.app/?search={search_term_string}", "query-input": "required name=search_term_string" }
+  "description": "Free online browser games. Play 2-player, puzzle, arcade and classic games instantly at BlitzGames.",
+  "potentialAction": { "@type": "SearchAction", "target": "https://tug-of-war-game-nu.vercel.app/?q={search_term_string}", "query-input": "required name=search_term_string" }
 }
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5925451023602971" crossorigin="anonymous"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #0f0f1a;
-  --surface: #1a1a2e;
-  --surface2: #16213e;
-  --accent: #f0c040;
-  --accent2: #e94560;
-  --text: #eee;
-  --text2: #aaa;
-  --border: #2a2a4a;
-  --sidebar-w: 220px;
+  --bg:       #0d001a;
+  --bg2:      #130025;
+  --card:     #1a0030;
+  --card2:    #200038;
+  --border:   #3a005a;
+  --accent:   #bf00ff;
+  --accent2:  #ff2d78;
+  --accent3:  #00e5ff;
+  --gold:     #ffd700;
+  --text:     #f0e6ff;
+  --text2:    #a080c0;
+  --radius:   16px;
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  overflow-x: hidden;
 }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 a { text-decoration: none; color: inherit; }
 
-/* ── HEADER ── */
+/* ══ HEADER ══ */
 header {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  height: 60px;
-  background: var(--surface);
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(13,0,26,0.92);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  display: flex; align-items: center;
-  padding: 0 20px; gap: 16px;
+  padding: 0 24px;
+  height: 64px;
+  display: flex; align-items: center; gap: 20px;
 }
+
 .logo {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 1.3rem; font-weight: 900;
-  color: var(--accent); letter-spacing: 1px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 1.4rem; font-weight: 900;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #bf00ff, #ff2d78);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   white-space: nowrap;
+  text-shadow: none;
 }
-.logo span { font-size: 1.5rem; }
-.search-bar {
-  flex: 1; max-width: 500px;
-  display: flex; align-items: center;
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 24px; padding: 8px 16px; gap: 8px;
-}
-.search-bar input {
-  flex: 1; background: none; border: none; outline: none;
-  color: var(--text); font-size: 0.95rem;
-}
-.search-bar input::placeholder { color: var(--text2); }
-.search-bar svg { color: var(--text2); flex-shrink: 0; }
-.header-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
-.header-tag {
-  background: var(--accent2); color: #fff;
-  border-radius: 20px; padding: 5px 14px;
-  font-size: 0.8rem; font-weight: 700;
-}
+.logo-icon { font-size: 1.6rem; -webkit-text-fill-color: initial; }
 
-/* ── LAYOUT ── */
-.layout {
-  display: flex;
-  margin-top: 60px;
-  min-height: calc(100vh - 60px);
+.search-wrap {
+  flex: 1; max-width: 420px;
+  position: relative;
 }
-
-/* ── SIDEBAR ── */
-sidebar, .sidebar {
-  width: var(--sidebar-w);
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  position: fixed; left: 0;
-  top: 60px; bottom: 0;
-  overflow-y: auto;
-  padding: 16px 0;
-  display: flex; flex-direction: column; gap: 4px;
-}
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-.sidebar-section { padding: 8px 16px 4px; font-size: 0.7rem; color: var(--text2); letter-spacing: 1.5px; text-transform: uppercase; }
-.sidebar-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 20px; cursor: pointer;
-  border-radius: 0; transition: background 0.15s;
-  font-size: 0.9rem; color: var(--text2);
-  border-left: 3px solid transparent;
-}
-.sidebar-item:hover, .sidebar-item.active {
-  background: var(--surface2);
-  color: var(--text);
-  border-left-color: var(--accent);
-}
-.sidebar-item span { font-size: 1.1rem; }
-.sidebar-count {
-  margin-left: auto;
-  background: var(--border);
-  border-radius: 10px;
-  padding: 1px 7px;
-  font-size: 0.7rem;
-  color: var(--text2);
-}
-
-/* ── MAIN ── */
-main {
-  flex: 1;
-  margin-left: var(--sidebar-w);
-  padding: 24px;
-  max-width: 100%;
-}
-
-/* ── HERO ── */
-.hero {
-  background: linear-gradient(135deg, #1a1a3e 0%, #0f0f2a 100%);
+.search-wrap input {
+  width: 100%;
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
-  display: flex; align-items: center; gap: 32px;
+  border-radius: 30px;
+  padding: 9px 16px 9px 40px;
+  color: var(--text); font-size: 0.92rem; outline: none;
+  transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap input::placeholder { color: var(--text2); }
+.search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 0.95rem; color: var(--text2);
+}
+
+.nav-links { display: flex; gap: 6px; margin-left: auto; }
+.nav-link {
+  padding: 7px 15px; border-radius: 20px;
+  font-size: 0.85rem; font-weight: 600;
+  color: var(--text2); cursor: pointer;
+  transition: all 0.15s; border: 1px solid transparent;
+}
+.nav-link:hover { color: var(--text); background: var(--card); border-color: var(--border); }
+.nav-link.cta {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; border-color: transparent;
+}
+.nav-link.cta:hover { opacity: 0.9; }
+
+/* ══ HERO ══ */
+.hero {
   position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #1a003a 0%, #0d001a 50%, #00001a 100%);
+  padding: 56px 32px 48px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
 }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 80% 50%, #f0c04011 0%, transparent 70%);
+  background:
+    radial-gradient(ellipse 60% 80% at 15% 50%, #bf00ff18 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 85% 50%, #ff2d7818 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 50% 100%, #00e5ff10 0%, transparent 70%);
 }
-.hero-text { flex: 1; position: relative; }
-.hero-badge {
-  display: inline-block;
-  background: var(--accent); color: #000;
-  font-size: 0.75rem; font-weight: 800;
-  padding: 3px 12px; border-radius: 20px;
-  margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;
+.hero-content { position: relative; max-width: 680px; margin: 0 auto; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, #bf00ff22, #ff2d7822);
+  border: 1px solid #bf00ff44;
+  border-radius: 30px; padding: 5px 16px;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #d080ff;
+  margin-bottom: 18px;
 }
-.hero-text h1 {
-  font-size: 2rem; font-weight: 900; line-height: 1.2;
-  margin-bottom: 10px;
-}
-.hero-text p {
-  color: var(--text2); font-size: 0.95rem;
-  line-height: 1.6; margin-bottom: 20px;
-}
-.hero-btn {
-  display: inline-block;
-  background: linear-gradient(135deg, var(--accent), #f9a825);
-  color: #000; font-weight: 800;
-  padding: 12px 28px; border-radius: 30px;
-  font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 20px #f0c04044;
-}
-.hero-btn:hover { transform: scale(1.04); box-shadow: 0 6px 25px #f0c04066; }
-.hero-emoji { font-size: 6rem; position: relative; animation: float 3s ease-in-out infinite; }
-@keyframes float {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-/* ── SECTION ── */
-.section-header {
-  display: flex; align-items: center; justify-content: space-between;
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 900; line-height: 1.1;
   margin-bottom: 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #d080ff 50%, #ff2d78 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p {
+  font-size: 1.05rem; color: var(--text2);
+  line-height: 1.7; margin-bottom: 28px;
+  max-width: 500px; margin-left: auto; margin-right: auto;
+}
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; font-weight: 800; font-size: 1rem;
+  padding: 13px 28px; border-radius: 30px;
+  box-shadow: 0 4px 24px #bf00ff44;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px #bf00ff66; }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--border);
+  font-weight: 700; font-size: 0.95rem;
+  padding: 13px 24px; border-radius: 30px;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.hero-stats {
+  display: flex; justify-content: center; gap: 32px;
+  margin-top: 36px; flex-wrap: wrap;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: 1.6rem; font-weight: 900; color: var(--accent); }
+.hero-stat-label { font-size: 0.78rem; color: var(--text2); margin-top: 2px; }
+
+/* ══ CATEGORY BAR ══ */
+.cat-bar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex; align-items: center; gap: 8px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.cat-bar::-webkit-scrollbar { display: none; }
+.cat-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 10px 18px; border-radius: 0;
+  font-size: 0.85rem; font-weight: 600; white-space: nowrap;
+  color: var(--text2); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.cat-pill:hover { color: var(--text); border-bottom-color: var(--border); }
+.cat-pill.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ══ MAIN CONTENT ══ */
+.content { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+/* ══ SECTION ══ */
+.section { margin-bottom: 48px; }
+.section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
 }
 .section-title {
-  font-size: 1.2rem; font-weight: 800;
-  display: flex; align-items: center; gap: 8px;
+  font-size: 1.15rem; font-weight: 800;
+  display: flex; align-items: center; gap: 10px;
 }
-.section-title .dot {
-  width: 4px; height: 22px;
-  background: var(--accent); border-radius: 2px;
+.section-title::before {
+  content: '';
+  display: block; width: 3px; height: 20px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2));
+  border-radius: 2px;
 }
 .see-all {
-  color: var(--accent); font-size: 0.85rem; font-weight: 600;
-  cursor: pointer;
-}
-
-/* ── CATEGORY CHIPS ── */
-.cat-chips {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  margin-bottom: 28px;
-}
-.cat-chip {
-  background: var(--surface);
+  font-size: 0.83rem; font-weight: 600;
+  color: var(--accent); cursor: pointer;
+  padding: 5px 14px; border-radius: 20px;
   border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 0.85rem; cursor: pointer;
   transition: all 0.15s;
-  color: var(--text2);
 }
-.cat-chip:hover, .cat-chip.active {
-  background: var(--accent); color: #000;
-  border-color: var(--accent); font-weight: 700;
-}
+.see-all:hover { background: var(--card); }
 
-/* ── GAME GRID ── */
+/* ══ GAME GRID ══ */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 16px;
-  margin-bottom: 36px;
 }
 
 .game-card {
-  background: var(--surface);
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s, border-color 0.2s;
+  position: relative;
 }
 .game-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px #0006;
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 40px #bf00ff33;
   border-color: var(--accent);
 }
-.game-thumb {
-  width: 100%; aspect-ratio: 4/3;
+.game-card.coming-soon { opacity: 0.5; cursor: not-allowed; }
+.game-card.coming-soon:hover { transform: none; box-shadow: none; border-color: var(--border); }
+.game-card.hidden { display: none; }
+
+.thumb {
+  width: 100%; aspect-ratio: 16/10;
   display: flex; align-items: center; justify-content: center;
-  font-size: 4rem;
-  position: relative; overflow: hidden;
+  font-size: 3.5rem; position: relative; overflow: hidden;
 }
-.game-thumb .play-overlay {
+.thumb-overlay {
   position: absolute; inset: 0;
-  background: #000a;
+  background: linear-gradient(180deg, transparent 40%, #00000099 100%);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 0.2s;
 }
-.game-card:hover .play-overlay { opacity: 1; }
-.play-overlay .play-icon {
-  width: 48px; height: 48px;
-  background: var(--accent);
-  border-radius: 50%;
+.game-card:hover .thumb-overlay { opacity: 1; }
+.play-circle {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 16px #bf00ff66;
+  animation: pulsePlay 1.5s ease-in-out infinite;
 }
-.game-info { padding: 12px; }
-.game-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
-.game-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.game-cat {
-  background: var(--surface2);
-  font-size: 0.7rem; color: var(--text2);
-  padding: 2px 8px; border-radius: 10px;
+@keyframes pulsePlay { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
+.card-body { padding: 12px 14px 14px; }
+.card-name { font-weight: 700; font-size: 0.92rem; margin-bottom: 6px; }
+.card-tags { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+
+.tag {
+  font-size: 0.68rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.5px;
 }
-.game-players {
-  font-size: 0.7rem; color: var(--text2);
-  margin-left: auto;
+.tag-cat { background: var(--card2); color: var(--text2); }
+.tag-hot { background: linear-gradient(135deg, #ff2d78, #ff6b6b); color: #fff; }
+.tag-new { background: linear-gradient(135deg, #00e5ff, #00b4cc); color: #000; }
+.tag-soon { background: var(--border); color: var(--text2); }
+
+/* ══ FEATURED CARD (bigger) ══ */
+.featured-card {
+  grid-column: span 2;
+  background: linear-gradient(135deg, #2a0050, #1a0030);
+  border: 1px solid #6000aa;
+  border-radius: var(--radius);
+  padding: 28px;
+  display: flex; align-items: center; gap: 24px;
+  position: relative; overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s, box-shadow 0.22s;
 }
-.badge-new {
-  background: #2ecc71; color: #000;
-  font-size: 0.65rem; font-weight: 800;
-  padding: 2px 7px; border-radius: 8px;
+.featured-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 50%, #bf00ff22 0%, transparent 70%);
 }
-.badge-hot {
-  background: var(--accent2); color: #fff;
-  font-size: 0.65rem; font-weight: 800;
-  padding: 2px 7px; border-radius: 8px;
+.featured-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px #bf00ff44; }
+.featured-content { flex: 1; position: relative; }
+.featured-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: linear-gradient(135deg, var(--gold), #ff9500);
+  color: #000; font-weight: 800; font-size: 0.72rem;
+  padding: 3px 12px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.featured-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; }
+.featured-desc { color: var(--text2); font-size: 0.88rem; line-height: 1.6; margin-bottom: 16px; }
+.featured-emoji {
+  font-size: 5rem; position: relative;
+  animation: floatEmoji 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes floatEmoji {
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(-12px) rotate(3deg)}
 }
 
-/* ── COMING SOON CARD ── */
-.game-card.coming-soon {
-  opacity: 0.6; cursor: not-allowed;
-}
-.game-card.coming-soon:hover {
-  transform: none; box-shadow: none;
-  border-color: var(--border);
-}
-.badge-soon {
-  background: var(--border); color: var(--text2);
-  font-size: 0.65rem; font-weight: 800;
-  padding: 2px 7px; border-radius: 8px;
-}
-
-/* ── HOW TO PLAY ── */
-.how-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px; margin-bottom: 28px;
-}
-.how-section h2 {
-  font-size: 1.3rem; font-weight: 800; margin-bottom: 18px;
-}
-.how-grid {
+/* ══ INFO BLOCKS ══ */
+.info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
+  margin-bottom: 48px;
 }
-.how-item {
-  display: flex; align-items: flex-start; gap: 14px;
-}
-.how-num {
-  width: 36px; height: 36px; flex-shrink: 0;
-  background: var(--accent); color: #000;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 1rem;
-}
-.how-item h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
-.how-item p { font-size: 0.82rem; color: var(--text2); line-height: 1.5; }
-
-/* ── ABOUT ── */
-.about-section {
-  background: var(--surface);
+.info-card {
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px; margin-bottom: 28px;
+  border-radius: var(--radius);
+  padding: 24px;
 }
-.about-section h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 12px; }
-.about-section p {
-  color: var(--text2); line-height: 1.8;
-  font-size: 0.92rem; margin-bottom: 10px;
-}
-.about-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-.about-tag {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 20px; padding: 4px 14px;
-  font-size: 0.8rem; color: var(--text2);
-}
+.info-card h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.info-card p { color: var(--text2); font-size: 0.87rem; line-height: 1.75; }
 
-/* ── FOOTER ── */
-footer {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 28px 24px 28px calc(var(--sidebar-w) + 24px);
-  display: flex; flex-wrap: wrap; gap: 16px;
-  align-items: center; justify-content: space-between;
+.steps { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+.step { display: flex; align-items: flex-start; gap: 12px; }
+.step-num {
+  width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 0.8rem; color: #fff;
 }
-.footer-logo { font-weight: 900; color: var(--accent); font-size: 1.1rem; }
-.footer-links { display: flex; gap: 20px; }
-.footer-links a { color: var(--text2); font-size: 0.85rem; transition: color 0.2s; }
-.footer-links a:hover { color: var(--accent); }
+.step p { color: var(--text2); font-size: 0.85rem; line-height: 1.6; margin: 0; padding-top: 3px; }
+.step strong { color: var(--text); }
+
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.topic-tag {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 0.78rem; color: var(--text2);
+  transition: all 0.15s; cursor: default;
+}
+.topic-tag:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ══ FOOTER ══ */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+}
+.footer-inner { max-width: 1200px; margin: 0 auto; }
+.footer-top {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 32px; flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.footer-brand .logo { font-size: 1.2rem; margin-bottom: 8px; display: flex; -webkit-text-fill-color: initial; background: none; }
+.footer-brand .logo span { background: linear-gradient(90deg, #bf00ff, #ff2d78); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.footer-brand p { color: var(--text2); font-size: 0.83rem; line-height: 1.6; max-width: 260px; }
+.footer-links-group h4 { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 12px; }
+.footer-links-group a { display: block; color: var(--text2); font-size: 0.85rem; margin-bottom: 8px; transition: color 0.15s; }
+.footer-links-group a:hover { color: var(--accent); }
+.footer-bottom {
+  border-top: 1px solid var(--border); padding-top: 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px;
+}
 .footer-copy { color: var(--text2); font-size: 0.8rem; }
 
-/* ── SEARCH HIDDEN ── */
-.game-card.hidden { display: none; }
-
-/* ── RESPONSIVE ── */
+/* ══ RESPONSIVE ══ */
 @media (max-width: 768px) {
-  :root { --sidebar-w: 0px; }
-  .sidebar { display: none; }
-  main { margin-left: 0; padding: 16px; }
-  .hero { flex-direction: column; padding: 24px; text-align: center; }
-  .hero-emoji { font-size: 4rem; }
-  .hero-text h1 { font-size: 1.5rem; }
-  .game-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-  footer { padding: 20px 16px; justify-content: center; text-align: center; }
-  .footer-links { flex-wrap: wrap; justify-content: center; }
-  header { padding: 0 12px; gap: 10px; }
-  .search-bar { max-width: 200px; }
+  .hero { padding: 36px 20px 32px; }
+  .hero h1 { font-size: 1.9rem; }
+  .hero-stats { gap: 20px; }
+  .content { padding: 20px 16px; }
+  .featured-card { grid-column: span 1; flex-direction: column; text-align: center; }
+  .featured-emoji { font-size: 3.5rem; }
+  .featured-title { font-size: 1.3rem; }
+  .game-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .nav-links { display: none; }
+  header { gap: 12px; padding: 0 16px; }
+  .footer-top { flex-direction: column; gap: 24px; }
+}
+@media (max-width: 480px) {
+  .game-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-btns { flex-direction: column; align-items: center; }
 }
 </style>
 </head>
 <body>
 
-<!-- ── HEADER ── -->
+<!-- ══ HEADER ══ -->
 <header>
-  <a href="/" class="logo"><span>🎮</span> GameZone</a>
-  <div class="search-bar">
-    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" id="search-input" placeholder="Search games..." oninput="filterGames(this.value)">
+  <a href="/" class="logo"><span class="logo-icon">⚡</span> <span>BlitzGames</span></a>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="Search games..." oninput="searchGames(this.value)">
   </div>
-  <div class="header-right">
-    <span class="header-tag">🆓 Free</span>
-  </div>
+  <nav class="nav-links">
+    <span class="nav-link" onclick="filterCat('2-player')">👥 2-Player</span>
+    <span class="nav-link" onclick="filterCat('puzzle')">🧩 Puzzle</span>
+    <span class="nav-link" onclick="filterCat('classic')">🕹️ Classic</span>
+    <a href="tug-of-war.html" class="nav-link cta">▶ Play Now</a>
+  </nav>
 </header>
 
-<!-- ── LAYOUT ── -->
-<div class="layout">
-
-  <!-- ── SIDEBAR ── -->
-  <div class="sidebar">
-    <div class="sidebar-section">Browse</div>
-    <div class="sidebar-item active" onclick="filterCat('all', this)"><span>🏠</span> All Games <span class="sidebar-count">8</span></div>
-    <div class="sidebar-item" onclick="filterCat('2-player', this)"><span>👥</span> 2-Player <span class="sidebar-count">3</span></div>
-    <div class="sidebar-item" onclick="filterCat('multiplayer', this)"><span>🌐</span> Multiplayer <span class="sidebar-count">1</span></div>
-    <div class="sidebar-item" onclick="filterCat('puzzle', this)"><span>🧩</span> Puzzle <span class="sidebar-count">3</span></div>
-    <div class="sidebar-item" onclick="filterCat('classic', this)"><span>🕹️</span> Classic <span class="sidebar-count">3</span></div>
-    <div class="sidebar-item" onclick="filterCat('casual', this)"><span>😎</span> Casual <span class="sidebar-count">4</span></div>
-
-    <div class="sidebar-section" style="margin-top:12px;">More</div>
-    <div class="sidebar-item" onclick="window.location='tug-of-war.html'"><span>⚔️</span> Tug of War</div>
-    <div class="sidebar-item" onclick="window.location='snake.html'"><span>🐍</span> Snake</div>
-    <div class="sidebar-item" onclick="window.location='tic-tac-toe.html'"><span>❌</span> Tic Tac Toe</div>
-    <div class="sidebar-item" onclick="window.location='memory.html'"><span>🃏</span> Memory Match</div>
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">⚡ Free · No Download · No Sign-up</div>
+    <h1>Play Free Online Games<br>Instantly in Browser</h1>
+    <p>Jump into action with our growing collection of free browser games. 2-player battles, brain puzzles, classic arcade and more — all free, forever.</p>
+    <div class="hero-btns">
+      <a href="tug-of-war.html" class="btn-primary">⚡ Play Featured Game</a>
+      <span class="btn-secondary" onclick="document.querySelector('.content').scrollIntoView({behavior:'smooth'})">🎮 Browse All Games</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">4+</div><div class="hero-stat-label">Free Games</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-label">Downloads Needed</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">100%</div><div class="hero-stat-label">Free Forever</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">📱</div><div class="hero-stat-label">Mobile Ready</div></div>
+    </div>
   </div>
+</section>
 
-  <!-- ── MAIN ── -->
-  <main>
+<!-- ══ CATEGORY BAR ══ -->
+<div class="cat-bar">
+  <div class="cat-pill active" onclick="filterCat('all',this)">🎮 All Games</div>
+  <div class="cat-pill" onclick="filterCat('2-player',this)">👥 2-Player</div>
+  <div class="cat-pill" onclick="filterCat('multiplayer',this)">🌐 Multiplayer</div>
+  <div class="cat-pill" onclick="filterCat('puzzle',this)">🧩 Puzzle</div>
+  <div class="cat-pill" onclick="filterCat('classic',this)">🕹️ Classic</div>
+  <div class="cat-pill" onclick="filterCat('casual',this)">😎 Casual</div>
+</div>
 
-    <!-- HERO -->
-    <div class="hero">
-      <div class="hero-text">
-        <div class="hero-badge">⚡ Featured Game</div>
-        <h1>Tug of War Dice Game</h1>
-        <p>The ultimate 2-player dice battle! Roll the dice and push the piece to your finish line. Play locally with a friend or challenge someone online in real-time multiplayer.</p>
-        <a href="tug-of-war.html" class="hero-btn">▶ Play Now — It's Free!</a>
-      </div>
-      <div class="hero-emoji">⚔️</div>
-    </div>
+<!-- ══ MAIN ══ -->
+<div class="content">
 
-    <!-- CATEGORY CHIPS -->
-    <div class="cat-chips">
-      <div class="cat-chip active" onclick="filterCat('all', null, this)">🎮 All Games</div>
-      <div class="cat-chip" onclick="filterCat('2-player', null, this)">👥 2-Player</div>
-      <div class="cat-chip" onclick="filterCat('multiplayer', null, this)">🌐 Multiplayer</div>
-      <div class="cat-chip" onclick="filterCat('puzzle', null, this)">🧩 Puzzle</div>
-      <div class="cat-chip" onclick="filterCat('classic', null, this)">🕹️ Classic</div>
-      <div class="cat-chip" onclick="filterCat('casual', null, this)">😎 Casual</div>
-    </div>
-
-    <!-- GAMES SECTION -->
-    <div class="section-header">
-      <div class="section-title"><div class="dot"></div> <span id="section-label">All Games</span></div>
+  <!-- GAMES SECTION -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title" id="section-label">All Games</div>
     </div>
 
     <div class="game-grid" id="game-grid">
 
-      <!-- Tug of War -->
-      <a href="tug-of-war.html" class="game-card" data-cats="2-player multiplayer casual">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #1a1a3e, #0f0f2a);">
-          ⚔️
-          <div class="play-overlay"><div class="play-icon">▶</div></div>
+      <!-- FEATURED: Tug of War -->
+      <a href="tug-of-war.html" class="featured-card" data-cats="2-player multiplayer casual">
+        <div class="featured-content">
+          <div class="featured-badge">⭐ Featured Game</div>
+          <div class="featured-title">Tug of War</div>
+          <div class="featured-desc">The ultimate 2-player dice battle! Roll the dice and push the piece to your finish line. Play locally or online in real-time multiplayer.</div>
+          <span class="btn-primary" style="display:inline-flex;font-size:0.9rem;padding:10px 22px;">▶ Play Now — Free</span>
         </div>
-        <div class="game-info">
-          <div class="game-name">Tug of War</div>
-          <div class="game-meta">
-            <span class="game-cat">2-Player</span>
-            <span class="badge-hot">🔥 Hot</span>
-          </div>
-        </div>
+        <div class="featured-emoji">⚔️</div>
       </a>
 
       <!-- Snake -->
       <a href="snake.html" class="game-card" data-cats="classic casual">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #0a2e0a, #0f1f0f);">
+        <div class="thumb" style="background:linear-gradient(135deg,#001a00,#003300);">
           🐍
-          <div class="play-overlay"><div class="play-icon">▶</div></div>
+          <div class="thumb-overlay"><div class="play-circle">▶</div></div>
         </div>
-        <div class="game-info">
-          <div class="game-name">Snake</div>
-          <div class="game-meta">
-            <span class="game-cat">Classic</span>
-            <span class="badge-new">✨ New</span>
+        <div class="card-body">
+          <div class="card-name">Snake</div>
+          <div class="card-tags">
+            <span class="tag tag-cat">Classic</span>
+            <span class="tag tag-new">New</span>
           </div>
         </div>
       </a>
 
       <!-- Tic Tac Toe -->
       <a href="tic-tac-toe.html" class="game-card" data-cats="2-player classic casual">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #1e1e3e, #12122a);">
+        <div class="thumb" style="background:linear-gradient(135deg,#1a001a,#300030);">
           ❌
-          <div class="play-overlay"><div class="play-icon">▶</div></div>
+          <div class="thumb-overlay"><div class="play-circle">▶</div></div>
         </div>
-        <div class="game-info">
-          <div class="game-name">Tic Tac Toe</div>
-          <div class="game-meta">
-            <span class="game-cat">2-Player</span>
-            <span class="badge-new">✨ New</span>
+        <div class="card-body">
+          <div class="card-name">Tic Tac Toe</div>
+          <div class="card-tags">
+            <span class="tag tag-cat">2-Player</span>
+            <span class="tag tag-new">New</span>
           </div>
         </div>
       </a>
 
       <!-- Memory Match -->
       <a href="memory.html" class="game-card" data-cats="puzzle casual">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #1a0a2e, #0f0a1f);">
+        <div class="thumb" style="background:linear-gradient(135deg,#00001a,#000033);">
           🃏
-          <div class="play-overlay"><div class="play-icon">▶</div></div>
+          <div class="thumb-overlay"><div class="play-circle">▶</div></div>
         </div>
-        <div class="game-info">
-          <div class="game-name">Memory Match</div>
-          <div class="game-meta">
-            <span class="game-cat">Puzzle</span>
-            <span class="badge-new">✨ New</span>
+        <div class="card-body">
+          <div class="card-name">Memory Match</div>
+          <div class="card-tags">
+            <span class="tag tag-cat">Puzzle</span>
+            <span class="tag tag-new">New</span>
           </div>
         </div>
       </a>
 
-      <!-- Coming soon cards -->
+      <!-- Coming Soon -->
       <div class="game-card coming-soon" data-cats="puzzle">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #1a1a2e, #111122);">🧩</div>
-        <div class="game-info">
-          <div class="game-name">2048</div>
-          <div class="game-meta"><span class="game-cat">Puzzle</span><span class="badge-soon">🔜 Soon</span></div>
+        <div class="thumb" style="background:linear-gradient(135deg,#1a1a00,#2a2a00);">🧩</div>
+        <div class="card-body">
+          <div class="card-name">2048</div>
+          <div class="card-tags"><span class="tag tag-cat">Puzzle</span><span class="tag tag-soon">Soon</span></div>
         </div>
       </div>
 
       <div class="game-card coming-soon" data-cats="2-player classic">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #2e1a0a, #1f100a);">♟️</div>
-        <div class="game-info">
-          <div class="game-name">Chess</div>
-          <div class="game-meta"><span class="game-cat">2-Player</span><span class="badge-soon">🔜 Soon</span></div>
+        <div class="thumb" style="background:linear-gradient(135deg,#1a0a00,#2a1500);">♟️</div>
+        <div class="card-body">
+          <div class="card-name">Chess</div>
+          <div class="card-tags"><span class="tag tag-cat">2-Player</span><span class="tag tag-soon">Soon</span></div>
         </div>
       </div>
 
       <div class="game-card coming-soon" data-cats="puzzle casual">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #0a2e2e, #0a1f1f);">🧮</div>
-        <div class="game-info">
-          <div class="game-name">Sudoku</div>
-          <div class="game-meta"><span class="game-cat">Puzzle</span><span class="badge-soon">🔜 Soon</span></div>
+        <div class="thumb" style="background:linear-gradient(135deg,#001a1a,#002a2a);">🧮</div>
+        <div class="card-body">
+          <div class="card-name">Sudoku</div>
+          <div class="card-tags"><span class="tag tag-cat">Puzzle</span><span class="tag tag-soon">Soon</span></div>
         </div>
       </div>
 
       <div class="game-card coming-soon" data-cats="classic casual">
-        <div class="game-thumb" style="background: linear-gradient(135deg, #1a1a0a, #111100);">🏓</div>
-        <div class="game-info">
-          <div class="game-name">Pong</div>
-          <div class="game-meta"><span class="game-cat">Classic</span><span class="badge-soon">🔜 Soon</span></div>
+        <div class="thumb" style="background:linear-gradient(135deg,#0a001a,#150030);">🏓</div>
+        <div class="card-body">
+          <div class="card-name">Pong</div>
+          <div class="card-tags"><span class="tag tag-cat">Classic</span><span class="tag tag-soon">Soon</span></div>
         </div>
       </div>
 
     </div>
+  </div>
 
-    <!-- HOW TO PLAY -->
-    <div class="how-section">
-      <h2>🕹️ How to Play Our Games</h2>
-      <div class="how-grid">
-        <div class="how-item">
-          <div class="how-num">1</div>
-          <div>
-            <h3>Choose a Game</h3>
-            <p>Browse our collection of free browser games. Filter by category to find what you love.</p>
-          </div>
-        </div>
-        <div class="how-item">
-          <div class="how-num">2</div>
-          <div>
-            <h3>Click to Play</h3>
-            <p>No downloads, no sign-up. Just click Play and the game starts instantly in your browser.</p>
-          </div>
-        </div>
-        <div class="how-item">
-          <div class="how-num">3</div>
-          <div>
-            <h3>Play Anywhere</h3>
-            <p>Works on desktop, laptop, tablet and mobile. Play alone or with a friend on the same screen.</p>
-          </div>
-        </div>
-        <div class="how-item">
-          <div class="how-num">4</div>
-          <div>
-            <h3>Challenge Friends</h3>
-            <p>Many games support 2-player mode. Some even let you play online with anyone in the world!</p>
-          </div>
-        </div>
+  <!-- INFO GRID -->
+  <div class="info-grid">
+
+    <div class="info-card">
+      <h2>🕹️ How to Play</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><p><strong>Pick a Game</strong> — Browse the collection and click any game card to start instantly.</p></div>
+        <div class="step"><div class="step-num">2</div><p><strong>No Setup Needed</strong> — No downloads, no accounts. Just click and play in seconds.</p></div>
+        <div class="step"><div class="step-num">3</div><p><strong>Play Anywhere</strong> — Works on desktop, mobile, and tablet. Landscape recommended for best experience.</p></div>
+        <div class="step"><div class="step-num">4</div><p><strong>Challenge Friends</strong> — Many games support 2-player mode on the same screen or online!</p></div>
       </div>
     </div>
 
-    <!-- ABOUT -->
-    <div class="about-section">
-      <h2>🎮 About GameZone — Free Browser Games</h2>
-      <p>Welcome to GameZone, your go-to destination for free online browser games! We offer a curated collection of fun, addictive games that work instantly in your browser — no downloads, no installations, no sign-ups required.</p>
-      <p>Whether you're looking for a quick 5-minute game during a break, a competitive 2-player game to play with a friend on the same screen, or a challenging puzzle to train your brain — we have something for everyone.</p>
-      <p>Our flagship game is <strong>Tug of War</strong>, an exciting 2-player dice game where you battle to pull the piece to your finish line. Play locally or online with real-time multiplayer powered by Firebase. We're constantly adding new games — from classic arcade games like Snake to strategy games like Tic Tac Toe and brain-training puzzles like Memory Match.</p>
-      <p>All games are completely free and designed to work on all devices — desktop, mobile, and tablet. GameZone is the perfect place to have fun and challenge your friends!</p>
-      <div class="about-tags">
-        <span class="about-tag">Free Online Games</span>
-        <span class="about-tag">Browser Games</span>
-        <span class="about-tag">2 Player Games</span>
-        <span class="about-tag">No Download</span>
-        <span class="about-tag">Multiplayer</span>
-        <span class="about-tag">Puzzle Games</span>
-        <span class="about-tag">Classic Arcade</span>
-        <span class="about-tag">Mobile Friendly</span>
+    <div class="info-card">
+      <h2>⚡ About BlitzGames</h2>
+      <p>BlitzGames is a free online browser game portal where you can play fun games instantly — no downloads, no sign-ups, no hassle. We're building a collection of high-quality games that work on any device.</p>
+      <p style="margin-top:10px;">Our flagship game is <strong>Tug of War</strong> — a real-time 2-player dice battle. We're constantly adding new games including puzzles, classics, and multiplayer challenges.</p>
+      <div class="tag-cloud">
+        <span class="topic-tag">Free Online Games</span>
+        <span class="topic-tag">Browser Games</span>
+        <span class="topic-tag">2 Player Games</span>
+        <span class="topic-tag">No Download</span>
+        <span class="topic-tag">Mobile Friendly</span>
+        <span class="topic-tag">Puzzle Games</span>
+        <span class="topic-tag">Multiplayer</span>
+        <span class="topic-tag">Classic Arcade</span>
       </div>
     </div>
 
-  </main>
+    <div class="info-card" style="grid-column:1/-1">
+      <h2>🎮 Why Play at BlitzGames?</h2>
+      <p>BlitzGames offers a curated collection of free browser games designed for everyone. Whether you want a quick 5-minute casual game, a competitive 2-player battle with a friend, or a challenging puzzle to train your brain — we have it all. Every game on BlitzGames is completely free, works instantly in your browser without any downloads or registrations, and is optimised for both desktop and mobile devices. Our 2-player games like Tug of War let you challenge friends on the same screen or online. Puzzle games like Memory Match sharpen your memory and focus. Classic games like Snake bring back nostalgic fun. And we're adding new free online games every week!</p>
+    </div>
+
+  </div>
+
 </div>
 
-<!-- ── FOOTER ── -->
+<!-- ══ FOOTER ══ -->
 <footer>
-  <div class="footer-logo">🎮 GameZone</div>
-  <div class="footer-links">
-    <a href="/">Home</a>
-    <a href="tug-of-war.html">Tug of War</a>
-    <a href="snake.html">Snake</a>
-    <a href="tic-tac-toe.html">Tic Tac Toe</a>
-    <a href="memory.html">Memory Match</a>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:8px;">⚡ <span>BlitzGames</span></div>
+        <p>Free online browser games. No downloads, no sign-up. Play instantly on any device.</p>
+      </div>
+      <div class="footer-links-group">
+        <h4>Games</h4>
+        <a href="tug-of-war.html">⚔️ Tug of War</a>
+        <a href="snake.html">🐍 Snake</a>
+        <a href="tic-tac-toe.html">❌ Tic Tac Toe</a>
+        <a href="memory.html">🃏 Memory Match</a>
+      </div>
+      <div class="footer-links-group">
+        <h4>Categories</h4>
+        <a href="/" onclick="filterCat('2-player')">👥 2-Player Games</a>
+        <a href="/" onclick="filterCat('puzzle')">🧩 Puzzle Games</a>
+        <a href="/" onclick="filterCat('classic')">🕹️ Classic Games</a>
+        <a href="/" onclick="filterCat('multiplayer')">🌐 Multiplayer</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 BlitzGames · Free Browser Games · No Download Needed</div>
+      <div class="footer-copy">Play free online games instantly — no sign-up required</div>
+    </div>
   </div>
-  <div class="footer-copy">© 2026 GameZone · Free Browser Games · No Download Needed</div>
 </footer>
 
 <script>
-function filterGames(query) {
-  const q = query.toLowerCase();
-  document.querySelectorAll('.game-card').forEach(card => {
-    const name = card.querySelector('.game-name')?.textContent.toLowerCase() || '';
+function searchGames(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('.game-card, .featured-card').forEach(card => {
+    if (card.classList.contains('coming-soon')) return;
+    const name = card.querySelector('.card-name, .featured-title')?.textContent.toLowerCase() || '';
     card.classList.toggle('hidden', q.length > 0 && !name.includes(q));
   });
 }
 
-function filterCat(cat, sidebarEl, chipEl) {
-  // Update sidebar active
-  if (sidebarEl) {
-    document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
-    sidebarEl.classList.add('active');
-  }
-  // Update chip active
-  if (chipEl) {
-    document.querySelectorAll('.cat-chip').forEach(el => el.classList.remove('active'));
-    chipEl.classList.add('active');
-  }
+function filterCat(cat, el) {
+  // update pills
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  if (el) el.classList.add('active');
 
-  // Filter cards
-  document.querySelectorAll('.game-card').forEach(card => {
-    if (cat === 'all') {
-      card.classList.remove('hidden');
-    } else {
-      const cats = card.getAttribute('data-cats') || '';
-      card.classList.toggle('hidden', !cats.includes(cat));
-    }
+  document.querySelectorAll('.game-card, .featured-card').forEach(card => {
+    if (cat === 'all') { card.classList.remove('hidden'); return; }
+    const cats = card.getAttribute('data-cats') || '';
+    card.classList.toggle('hidden', !cats.includes(cat));
   });
 
-  // Update label
-  const labels = { all: 'All Games', '2-player': '2-Player Games', multiplayer: 'Multiplayer Games', puzzle: 'Puzzle Games', classic: 'Classic Games', casual: 'Casual Games' };
+  const labels = { all:'All Games', '2-player':'2-Player Games', multiplayer:'Multiplayer', puzzle:'Puzzle Games', classic:'Classic Games', casual:'Casual Games' };
   document.getElementById('section-label').textContent = labels[cat] || 'Games';
 }
 </script>
 
-<!-- MONETIZATION -->
 <script src="monetization.js"></script>
-
 </body>
 </html>

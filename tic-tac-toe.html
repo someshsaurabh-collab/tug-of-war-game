@@ -11,13 +11,24 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5925451023602971" crossorigin="anonymous"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-:root { --bg: #0f0f1a; --surface: #1a1a2e; --border: #2a2a4a; --x: #e94560; --o: #f0c040; }
-body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #eee; min-height: 100vh; display: flex; flex-direction: column; }
+:root {
+  --bg: #0d001a; --surface: #1a0030; --border: #3a005a;
+  --accent: #bf00ff; --accent2: #ff2d78; --accent3: #00e5ff;
+  --x: #e94560; --o: #bf00ff; --text: #f0e6ff; --text2: #a080c0;
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 a { text-decoration: none; color: inherit; }
 
-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
-.back-btn { background: var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; }
-.back-btn:hover { background: #f0c040; color: #000; }
+header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(13,0,26,0.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 60px;
+  display: flex; align-items: center; gap: 16px;
+}
+.logo { font-size: 1.2rem; font-weight: 900; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.back-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; color: var(--text2); }
+.back-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); -webkit-text-fill-color: #fff; }
 .page-title { font-weight: 800; font-size: 1.1rem; }
 
 .game-main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 32px 24px; gap: 24px; }
@@ -27,14 +38,15 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   background: var(--surface); border: 2px solid var(--border);
   border-radius: 14px; padding: 14px 24px;
   text-align: center; min-width: 120px; transition: all 0.2s;
+  color: var(--text);
 }
 .player-card.active { border-color: currentColor; box-shadow: 0 0 20px currentColor22; }
-.player-card.x-card { color: var(--x); }
-.player-card.o-card { color: var(--o); }
+.player-card.x-card { color: var(--x); border-color: #3a005a; }
+.player-card.o-card { color: var(--o); border-color: #3a005a; }
 .player-symbol { font-size: 2rem; font-weight: 900; }
 .player-label { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
 .player-score { font-size: 1.2rem; font-weight: 800; margin-top: 4px; }
-.turn-badge { background: var(--border); border-radius: 20px; padding: 8px 20px; font-size: 0.9rem; font-weight: 700; }
+.turn-badge { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 8px 20px; font-size: 0.9rem; font-weight: 700; }
 
 .board {
   display: grid; grid-template-columns: repeat(3, 1fr);
@@ -49,7 +61,7 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
   cursor: pointer; transition: background 0.15s, transform 0.1s;
   user-select: none;
 }
-.cell:hover:empty { background: #ffffff08; transform: scale(1.03); }
+.cell:hover:empty { background: #2a004a; transform: scale(1.03); }
 .cell.x { color: var(--x); }
 .cell.o { color: var(--o); }
 .cell.win { background: #ffffff15; animation: winPulse 0.6s ease; }
@@ -64,36 +76,37 @@ header { background: var(--surface); border-bottom: 1px solid var(--border); pad
 
 .action-btns { display: flex; gap: 12px; }
 .btn-reset {
-  background: linear-gradient(135deg, #f0c040, #f9a825);
-  color: #000; border: none; border-radius: 30px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; border: none; border-radius: 30px;
   padding: 12px 28px; font-size: 0.95rem; font-weight: 800;
-  cursor: pointer; transition: transform 0.2s;
+  cursor: pointer; transition: transform 0.2s, opacity 0.2s;
 }
-.btn-reset:hover { transform: scale(1.04); }
+.btn-reset:hover { transform: scale(1.04); opacity: 0.9; }
 .btn-sec {
-  background: var(--surface); color: #aaa;
+  background: var(--surface); color: var(--text2);
   border: 1px solid var(--border); border-radius: 30px;
   padding: 12px 24px; font-size: 0.9rem;
   cursor: pointer; transition: all 0.2s;
 }
-.btn-sec:hover { color: #fff; border-color: #555; }
+.btn-sec:hover { color: var(--text); border-color: var(--accent); }
 
 .info-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 480px; width: 100%; }
 .info-section h2 { font-size: 1rem; font-weight: 800; margin-bottom: 10px; }
-.info-section p { color: #aaa; font-size: 0.87rem; line-height: 1.7; }
+.info-section p { color: var(--text2); font-size: 0.87rem; line-height: 1.7; }
 
 footer { background: var(--surface); border-top: 1px solid var(--border); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .footer-nav { display: flex; gap: 16px; }
-.footer-nav a { color: #aaa; font-size: 0.85rem; }
-.footer-nav a:hover { color: #f0c040; }
+.footer-nav a { color: var(--text2); font-size: 0.85rem; }
+.footer-nav a:hover { color: var(--accent); }
 </style>
 </head>
 <body>
 
 <header>
-  <a href="/" class="back-btn">← Back</a>
+  <a href="/" class="logo">⚡ BlitzGames</a>
+  <a href="/" class="back-btn">← All Games</a>
   <div class="page-title">❌ Tic Tac Toe</div>
-  <div style="margin-left:auto;color:#aaa;font-size:0.85rem;">2 Players · Same Screen</div>
+  <div style="margin-left:auto;color:var(--text2);font-size:0.85rem;">2 Players · Same Screen</div>
 </header>
 
 <div class="game-main">
@@ -142,7 +155,7 @@ footer { background: var(--surface); border-top: 1px solid var(--border); paddin
 </div>
 
 <footer>
-  <div style="font-weight:800;color:#f0c040;">🎮 GameZone</div>
+  <div style="font-weight:900;background:linear-gradient(90deg,#bf00ff,#ff2d78);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">⚡ BlitzGames</div>
   <div class="footer-nav">
     <a href="/">All Games</a>
     <a href="tug-of-war.html">Tug of War</a>
