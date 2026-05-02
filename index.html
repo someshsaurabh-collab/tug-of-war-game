@@ -60,7 +60,7 @@
   --accent3:  #00e5ff;
   --gold:     #ffd700;
   --text:     #f0e6ff;
-  --text2:    #a080c0;
+  --text2:    #b899d8;
   --radius:   16px;
 }
 
@@ -142,6 +142,7 @@ header {
   padding: 56px 32px 48px;
   text-align: center;
   border-bottom: 1px solid var(--border);
+  min-height: 420px; /* CLS fix – reserves space before fonts/content loads */
 }
 .hero::before {
   content: '';
@@ -361,8 +362,8 @@ header {
   border-radius: var(--radius);
   padding: 24px;
 }
-.info-card h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.info-card p { color: var(--text2); font-size: 0.87rem; line-height: 1.75; }
+.info-card h2, .info-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.info-card p { color: #b899d8; font-size: 0.87rem; line-height: 1.75; }
 
 .steps { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
 .step { display: flex; align-items: flex-start; gap: 12px; }
@@ -466,6 +467,7 @@ footer {
 </section>
 
 <!-- ══ CATEGORY BAR ══ -->
+<main>
 <div class="cat-bar">
   <div class="cat-pill active" onclick="filterCat('all',this)">🎮 All Games</div>
   <div class="cat-pill" onclick="filterCat('2-player',this)">👥 2-Player</div>
@@ -582,7 +584,7 @@ footer {
   <div class="info-grid">
 
     <div class="info-card">
-      <h2>🕹️ How to Play</h2>
+      <h3>🕹️ How to Play</h3>
       <div class="steps">
         <div class="step"><div class="step-num">1</div><p><strong>Pick a Game</strong> — Browse the collection and click any game card to start instantly.</p></div>
         <div class="step"><div class="step-num">2</div><p><strong>No Setup Needed</strong> — No downloads, no accounts. Just click and play in seconds.</p></div>
@@ -592,7 +594,7 @@ footer {
     </div>
 
     <div class="info-card">
-      <h2>⚡ About BlitzGames</h2>
+      <h3>⚡ About BlitzGames</h3>
       <p>BlitzGames is a free online browser game portal where you can play fun games instantly — no downloads, no sign-ups, no hassle. We're building a collection of high-quality games that work on any device.</p>
       <p style="margin-top:10px;">Our flagship game is <strong>Tug of War</strong> — a real-time 2-player dice battle. We're constantly adding new games including puzzles, classics, and multiplayer challenges.</p>
       <div class="tag-cloud">
@@ -608,13 +610,15 @@ footer {
     </div>
 
     <div class="info-card" style="grid-column:1/-1">
-      <h2>🎮 Why Play at BlitzGames?</h2>
+      <h3>🎮 Why Play at BlitzGames?</h3>
       <p>BlitzGames offers a curated collection of free browser games designed for everyone. Whether you want a quick 5-minute casual game, a competitive 2-player battle with a friend, or a challenging puzzle to train your brain — we have it all. Every game on BlitzGames is completely free, works instantly in your browser without any downloads or registrations, and is optimised for both desktop and mobile devices. Our 2-player games like Tug of War let you challenge friends on the same screen or online. Puzzle games like Memory Match sharpen your memory and focus. Classic games like Snake bring back nostalgic fun. And we're adding new free online games every week!</p>
     </div>
 
   </div>
 
 </div>
+
+</main>
 
 <!-- ══ FOOTER ══ -->
 <footer>
