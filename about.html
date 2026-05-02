@@ -127,7 +127,7 @@ header {
 .play-link:hover { gap: 10px; }
 
 /* ══ CONTACT CARD ══ */
-.contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 8px; }
+.contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
 .contact-item {
   background: var(--bg2); border: 1px solid var(--border);
   border-radius: 12px; padding: 20px; text-align: center;
@@ -148,7 +148,7 @@ footer { background: var(--card); border-top: 1px solid var(--border); padding: 
   .page-hero h1 { font-size: 1.8rem; }
   .stat-row { grid-template-columns: repeat(2, 1fr); }
   .values-grid { grid-template-columns: 1fr; }
-  .contact-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: repeat(2, 1fr); }
   .section-card { padding: 24px 18px; }
 }
 </style>
@@ -288,6 +288,11 @@ footer { background: var(--card); border-top: 1px solid var(--border); padding: 
     <h2>📬 Get In Touch</h2>
     <p>Have feedback, a game idea, or want to say hi? We'd love to hear from you. BlitzGames is a passion project and every message matters to us.</p>
     <div class="contact-grid">
+      <div class="contact-item">
+        <div class="contact-icon">📧</div>
+        <div class="contact-label">Email</div>
+        <div class="contact-val"><a href="mailto:somesh.saurabh.official@gmail.com" style="color:var(--accent);word-break:break-all;">somesh.saurabh.official@gmail.com</a></div>
+      </div>
       <div class="contact-item">
         <div class="contact-icon">🌐</div>
         <div class="contact-label">Website</div>
