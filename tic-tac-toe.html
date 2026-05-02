@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe – Free 2 Player Browser Game | GameZone</title>
+<meta name="description" content="Play Tic Tac Toe free in your browser! Classic X and O game for 2 players. No download, no sign-up. Works on mobile and desktop instantly.">
+<meta name="keywords" content="tic tac toe, noughts and crosses, 2 player game, free browser game, x and o game, play tic tac toe online">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://tug-of-war-game-nu.vercel.app/tic-tac-toe.html">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5925451023602971" crossorigin="anonymous"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #0f0f1a; --surface: #1a1a2e; --border: #2a2a4a; --x: #e94560; --o: #f0c040; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #eee; min-height: 100vh; display: flex; flex-direction: column; }
+a { text-decoration: none; color: inherit; }
+
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+.back-btn { background: var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; }
+.back-btn:hover { background: #f0c040; color: #000; }
+.page-title { font-weight: 800; font-size: 1.1rem; }
+
+.game-main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 32px 24px; gap: 24px; }
+
+.players { display: flex; gap: 20px; }
+.player-card {
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: 14px; padding: 14px 24px;
+  text-align: center; min-width: 120px; transition: all 0.2s;
+}
+.player-card.active { border-color: currentColor; box-shadow: 0 0 20px currentColor22; }
+.player-card.x-card { color: var(--x); }
+.player-card.o-card { color: var(--o); }
+.player-symbol { font-size: 2rem; font-weight: 900; }
+.player-label { font-size: 0.75rem; color: #aaa; margin-top: 4px; }
+.player-score { font-size: 1.2rem; font-weight: 800; margin-top: 4px; }
+.turn-badge { background: var(--border); border-radius: 20px; padding: 8px 20px; font-size: 0.9rem; font-weight: 700; }
+
+.board {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; width: 320px;
+}
+.cell {
+  width: 100px; height: 100px;
+  background: var(--surface); border: 2px solid var(--border);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; font-weight: 900;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+  user-select: none;
+}
+.cell:hover:empty { background: #ffffff08; transform: scale(1.03); }
+.cell.x { color: var(--x); }
+.cell.o { color: var(--o); }
+.cell.win { background: #ffffff15; animation: winPulse 0.6s ease; }
+@keyframes winPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+.result-msg {
+  font-size: 1.4rem; font-weight: 900;
+  min-height: 2rem; text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+.action-btns { display: flex; gap: 12px; }
+.btn-reset {
+  background: linear-gradient(135deg, #f0c040, #f9a825);
+  color: #000; border: none; border-radius: 30px;
+  padding: 12px 28px; font-size: 0.95rem; font-weight: 800;
+  cursor: pointer; transition: transform 0.2s;
+}
+.btn-reset:hover { transform: scale(1.04); }
+.btn-sec {
+  background: var(--surface); color: #aaa;
+  border: 1px solid var(--border); border-radius: 30px;
+  padding: 12px 24px; font-size: 0.9rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-sec:hover { color: #fff; border-color: #555; }
+
+.info-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 480px; width: 100%; }
+.info-section h2 { font-size: 1rem; font-weight: 800; margin-bottom: 10px; }
+.info-section p { color: #aaa; font-size: 0.87rem; line-height: 1.7; }
+
+footer { background: var(--surface); border-top: 1px solid var(--border); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.footer-nav { display: flex; gap: 16px; }
+.footer-nav a { color: #aaa; font-size: 0.85rem; }
+.footer-nav a:hover { color: #f0c040; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="back-btn">← Back</a>
+  <div class="page-title">❌ Tic Tac Toe</div>
+  <div style="margin-left:auto;color:#aaa;font-size:0.85rem;">2 Players · Same Screen</div>
+</header>
+
+<div class="game-main">
+
+  <div class="players">
+    <div class="player-card x-card active" id="card-x">
+      <div class="player-symbol">✕</div>
+      <div class="player-label">Player 1</div>
+      <div class="player-score" id="score-x">0</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+      <div class="turn-badge" id="turn-msg">Player 1's turn</div>
+      <div style="color:#aaa;font-size:0.8rem;" id="draws-label">Draws: 0</div>
+    </div>
+    <div class="player-card o-card" id="card-o">
+      <div class="player-symbol">○</div>
+      <div class="player-label">Player 2</div>
+      <div class="player-score" id="score-o">0</div>
+    </div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="cell" onclick="play(0)"></div>
+    <div class="cell" onclick="play(1)"></div>
+    <div class="cell" onclick="play(2)"></div>
+    <div class="cell" onclick="play(3)"></div>
+    <div class="cell" onclick="play(4)"></div>
+    <div class="cell" onclick="play(5)"></div>
+    <div class="cell" onclick="play(6)"></div>
+    <div class="cell" onclick="play(7)"></div>
+    <div class="cell" onclick="play(8)"></div>
+  </div>
+
+  <div class="result-msg" id="result"></div>
+
+  <div class="action-btns">
+    <button class="btn-reset" onclick="resetBoard()">🔄 New Round</button>
+    <a href="/" class="btn-sec">🏠 All Games</a>
+  </div>
+
+  <div class="info-section">
+    <h2>🕹️ How to Play Tic Tac Toe</h2>
+    <p>Player 1 is <strong style="color:#e94560">✕</strong> and Player 2 is <strong style="color:#f0c040">○</strong>. Take turns clicking empty cells. Get 3 in a row — horizontally, vertically, or diagonally — to win! If all cells are filled with no winner, it's a draw. Best of 5 rounds wins!</p>
+  </div>
+
+</div>
+
+<footer>
+  <div style="font-weight:800;color:#f0c040;">🎮 GameZone</div>
+  <div class="footer-nav">
+    <a href="/">All Games</a>
+    <a href="tug-of-war.html">Tug of War</a>
+    <a href="snake.html">Snake</a>
+    <a href="memory.html">Memory</a>
+  </div>
+</footer>
+
+<script>
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let board, current, scores = {X:0, O:0}, draws = 0, gameOver;
+
+function init() {
+  board = Array(9).fill('');
+  current = 'X'; gameOver = false;
+  document.querySelectorAll('.cell').forEach(c => { c.textContent=''; c.className='cell'; });
+  document.getElementById('result').textContent = '';
+  updateTurn();
+}
+
+function updateTurn() {
+  document.getElementById('turn-msg').textContent = current === 'X' ? "Player 1's turn" : "Player 2's turn";
+  document.getElementById('card-x').classList.toggle('active', current === 'X');
+  document.getElementById('card-o').classList.toggle('active', current === 'O');
+}
+
+function play(i) {
+  if (gameOver || board[i]) return;
+  board[i] = current;
+  const cells = document.querySelectorAll('.cell');
+  cells[i].textContent = current === 'X' ? '✕' : '○';
+  cells[i].classList.add(current.toLowerCase());
+
+  const win = WINS.find(([a,b,c]) => board[a] && board[a]===board[b] && board[b]===board[c]);
+  if (win) {
+    win.forEach(idx => cells[idx].classList.add('win'));
+    scores[current]++;
+    document.getElementById(`score-${current.toLowerCase()}`).textContent = scores[current];
+    document.getElementById('result').innerHTML = current==='X'
+      ? `<span style="color:#e94560">✕ Player 1 Wins! 🎉</span>`
+      : `<span style="color:#f0c040">○ Player 2 Wins! 🎉</span>`;
+    gameOver = true;
+    document.getElementById('turn-msg').textContent = 'Round over!';
+    return;
+  }
+  if (board.every(v => v)) {
+    draws++;
+    document.getElementById('draws-label').textContent = `Draws: ${draws}`;
+    document.getElementById('result').innerHTML = `<span style="color:#aaa">It's a Draw! 🤝</span>`;
+    gameOver = true;
+    document.getElementById('turn-msg').textContent = 'Draw!';
+    return;
+  }
+  current = current === 'X' ? 'O' : 'X';
+  updateTurn();
+}
+
+function resetBoard() { init(); }
+
+init();
+</script>
+
+<script src="monetization.js"></script>
+</body>
+</html>

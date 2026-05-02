@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Match – Free Brain Training Puzzle Game | GameZone</title>
+<meta name="description" content="Play Memory Match free in your browser! Flip cards and find matching pairs. A fun brain training puzzle game for all ages. No download needed.">
+<meta name="keywords" content="memory match game, memory card game, brain training game, free puzzle game, concentration game, flip cards game, browser memory game">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://tug-of-war-game-nu.vercel.app/memory.html">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5925451023602971" crossorigin="anonymous"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #0f0f1a; --surface: #1a1a2e; --border: #2a2a4a; --accent: #f0c040; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #eee; min-height: 100vh; display: flex; flex-direction: column; }
+a { text-decoration: none; color: inherit; }
+
+header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+.back-btn { background: var(--border); border-radius: 20px; padding: 6px 14px; font-size: 0.85rem; cursor: pointer; transition: background 0.2s; }
+.back-btn:hover { background: var(--accent); color: #000; }
+
+.game-main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 24px; gap: 20px; }
+
+.stats { display: flex; gap: 16px; }
+.stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 20px; text-align: center; min-width: 90px; }
+.stat-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+.stat-val { font-size: 1.4rem; font-weight: 900; color: var(--accent); }
+
+.difficulty { display: flex; gap: 8px; }
+.diff-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 6px 16px;
+  font-size: 0.82rem; cursor: pointer; color: #aaa; transition: all 0.15s;
+}
+.diff-btn:hover, .diff-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+
+.grid {
+  display: grid;
+  gap: 10px;
+  max-width: 520px; width: 100%;
+}
+.grid.easy { grid-template-columns: repeat(4, 1fr); }
+.grid.medium { grid-template-columns: repeat(4, 1fr); }
+.grid.hard { grid-template-columns: repeat(6, 1fr); }
+
+.card {
+  aspect-ratio: 1;
+  perspective: 600px;
+  cursor: pointer;
+}
+.card-inner {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  border-radius: 12px;
+}
+.card.flipped .card-inner, .card.matched .card-inner { transform: rotateY(180deg); }
+
+.card-front, .card-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+  border: 2px solid var(--border);
+}
+.card-front {
+  background: var(--surface2, #16213e);
+  background: linear-gradient(135deg, #16213e, #1a1a2e);
+  font-size: 1.5rem; color: #2a2a4a;
+}
+.card-back {
+  background: linear-gradient(135deg, #1a1a3e, #0f0f2a);
+  transform: rotateY(180deg);
+}
+.card.matched .card-back {
+  background: linear-gradient(135deg, #0a2e1a, #0a1f12);
+  border-color: #2ecc71;
+  animation: matchPop 0.4s ease;
+}
+@keyframes matchPop { 0%,100%{transform:rotateY(180deg) scale(1)} 50%{transform:rotateY(180deg) scale(1.1)} }
+
+.result-banner {
+  background: linear-gradient(135deg, #1a1a3e, #0f0f2a);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 24px 40px;
+  text-align: center;
+  display: none;
+}
+.result-banner.show { display: block; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+.result-banner h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 8px; }
+.result-banner p { color: #aaa; margin-bottom: 16px; }
+.play-btn {
+  background: var(--accent); color: #000;
+  border: none; border-radius: 30px;
+  padding: 12px 30px; font-size: 1rem; font-weight: 800;
+  cursor: pointer; transition: transform 0.2s;
+}
+.play-btn:hover { transform: scale(1.05); }
+
+.info-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 520px; width: 100%; }
+.info-section h2 { font-size: 1rem; font-weight: 800; margin-bottom: 10px; }
+.info-section p { color: #aaa; font-size: 0.87rem; line-height: 1.7; }
+
+footer { background: var(--surface); border-top: 1px solid var(--border); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.footer-nav { display: flex; gap: 16px; }
+.footer-nav a { color: #aaa; font-size: 0.85rem; }
+.footer-nav a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="back-btn">← Back</a>
+  <div style="font-weight:800;font-size:1.1rem;">🃏 Memory Match</div>
+  <div style="margin-left:auto;color:#aaa;font-size:0.85rem;">Find all matching pairs!</div>
+</header>
+
+<div class="game-main">
+
+  <div class="stats">
+    <div class="stat-box"><div class="stat-label">Moves</div><div class="stat-val" id="moves">0</div></div>
+    <div class="stat-box"><div class="stat-label">Matches</div><div class="stat-val" id="matches">0</div></div>
+    <div class="stat-box"><div class="stat-label">Time</div><div class="stat-val" id="timer">0s</div></div>
+    <div class="stat-box"><div class="stat-label">Best</div><div class="stat-val" id="best">--</div></div>
+  </div>
+
+  <div class="difficulty">
+    <div class="diff-btn active" onclick="newGame(8, this)">Easy (4×4)</div>
+    <div class="diff-btn" onclick="newGame(12, this)">Medium (4×6)</div>
+    <div class="diff-btn" onclick="newGame(18, this)">Hard (6×6)</div>
+  </div>
+
+  <div class="grid easy" id="grid"></div>
+
+  <div class="result-banner" id="result-banner">
+    <h2>🎉 You Win!</h2>
+    <p id="result-text">Great job!</p>
+    <button class="play-btn" onclick="newGame(currentPairs*2)">▶ Play Again</button>
+  </div>
+
+  <div class="info-section">
+    <h2>🕹️ How to Play Memory Match</h2>
+    <p>Flip two cards at a time to find matching emoji pairs. If they match, they stay face up. If not, they flip back. Find all pairs in as few moves as possible! Choose your difficulty and challenge yourself to beat your best time.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div style="font-weight:800;color:#f0c040;">🎮 GameZone</div>
+  <div class="footer-nav">
+    <a href="/">All Games</a>
+    <a href="tug-of-war.html">Tug of War</a>
+    <a href="snake.html">Snake</a>
+    <a href="tic-tac-toe.html">Tic Tac Toe</a>
+  </div>
+</footer>
+
+<script>
+const EMOJIS = ['🐶','🐱','🦊','🐸','🦁','🐯','🐺','🦋','🌸','🍕','⚡','🎯','🚀','🌈','💎','🎸','🏆','🎭'];
+let flipped=[], matched=0, moves=0, currentPairs=8, lockBoard=false, timerInt, seconds=0, bests={};
+
+function shuffle(arr) { return [...arr].sort(()=>Math.random()-0.5); }
+
+function newGame(pairs, diffEl) {
+  clearInterval(timerInt);
+  if (diffEl) {
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+    diffEl.classList.add('active');
+  }
+  currentPairs = pairs;
+  flipped=[]; matched=0; moves=0; seconds=0; lockBoard=false;
+  document.getElementById('moves').textContent='0';
+  document.getElementById('matches').textContent='0';
+  document.getElementById('timer').textContent='0s';
+  document.getElementById('result-banner').classList.remove('show');
+
+  const grid = document.getElementById('grid');
+  grid.className = 'grid ' + (pairs===8?'easy':pairs===12?'medium':'hard');
+  grid.innerHTML='';
+
+  const emojis = shuffle(EMOJIS).slice(0, pairs);
+  const cards = shuffle([...emojis,...emojis]);
+
+  cards.forEach((emoji, i) => {
+    const card = document.createElement('div');
+    card.className='card';
+    card.dataset.emoji = emoji;
+    card.dataset.idx = i;
+    card.innerHTML=`<div class="card-inner"><div class="card-front">🂠</div><div class="card-back">${emoji}</div></div>`;
+    card.addEventListener('click', ()=>flipCard(card));
+    grid.appendChild(card);
+  });
+
+  timerInt = setInterval(()=>{
+    seconds++;
+    document.getElementById('timer').textContent=seconds+'s';
+  }, 1000);
+}
+
+function flipCard(card) {
+  if (lockBoard || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  card.classList.add('flipped');
+  flipped.push(card);
+  if (flipped.length===2) checkMatch();
+}
+
+function checkMatch() {
+  lockBoard=true; moves++;
+  document.getElementById('moves').textContent=moves;
+  const [a,b]=flipped;
+  if (a.dataset.emoji===b.dataset.emoji) {
+    a.classList.add('matched'); b.classList.add('matched');
+    matched++;
+    document.getElementById('matches').textContent=matched;
+    flipped=[]; lockBoard=false;
+    if (matched===currentPairs) winGame();
+  } else {
+    setTimeout(()=>{ a.classList.remove('flipped'); b.classList.remove('flipped'); flipped=[]; lockBoard=false; }, 900);
+  }
+}
+
+function winGame() {
+  clearInterval(timerInt);
+  const key = currentPairs;
+  if (!bests[key] || moves < bests[key]) bests[key] = moves;
+  document.getElementById('best').textContent = bests[currentPairs]+'mv';
+  document.getElementById('result-text').textContent=`Completed in ${moves} moves and ${seconds} seconds! Best: ${bests[key]} moves.`;
+  document.getElementById('result-banner').classList.add('show');
+}
+
+newGame(8);
+</script>
+
+<script src="monetization.js"></script>
+</body>
+</html>
